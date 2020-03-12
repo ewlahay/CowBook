@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block app_content %}
+{{table}}
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ fancy_table('HerdTable') }}
+{%- endblock scripts %}

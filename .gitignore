@@ -1,0 +1,7 @@
+/venv/
+/dist/
+/Data/
+/CowBook.egg-info/
+/build/
+/.idea/
+/migrations/

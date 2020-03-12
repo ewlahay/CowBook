@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block app_content %}
+    {% if cow.photo %}
+        <img src="{{'/static/Pictures/' + cow.photo}}" height="200" style="float:left; margin-right:10px">
+    {% endif %}
+    <span style="float: right">
+        {{ utils.form_button(url_for('edit_dam', cowId=cow.id), "{} Dam".format("Edit" if dam else "Add"), method='get', class="btn btn-{}".format("default" if dam else "primary")) }}
+        {{ utils.form_button(url_for('edit_sire', cowId=cow.id), "{} Sire".format("Edit" if sire else "Add"), method='get', class="btn btn-{}".format("default" if sire else "primary")) }}
+        {{ utils.form_button(url_for('edit_cow', cowId=cow.id), "Edit", method='get', class="btn btn-default") }}
+    </span>
+    <div id="cowInfo">
+        <h3>
+            Name: {{cow.name}}<br>
+            DOB: {{cow.dob}}<br>
+            Tag #: {{cow.earTag}}<br>
+            Sex: {{cow.sex}}<br>
+            Carrier: {{cow.carrier}}<br>
+            Owner: {{cow.owner}}<br>
+            Markings: {{cow.markings}}<br><br>
+
+            {% if dam or sire %}
+            Parents:<br>
+            </h3>
+                <h4>
+                {% if dam %}
+                    Dam: <a href="{{url_for('cow', cowId=dam.id)}}">{{dam.__str__()}}</a><br>
+                {% endif %}
+                {% if sire %}
+                    Sire: <a href="{{url_for('cow', cowId=sire.id)}}">{{sire.__str__()}}</a>
+                {% endif %}
+                </h4>
+            {% else %}
+            </h3>
+            {% endif %}
+
+    </div>
+
+    <div id="tables">
+        {% if cow.sex != "steer"%}
+        <h3>Calves:</h3>
+            {{calves}}
+        {% endif %}
+        <h3>Weights:</h3>
+            {{weights}}
+        <h3>Events:</h3>
+            {{events}}
+        <h3>Treatments:</h3>
+            {{treatments}}
+        {% if cow.sex == "female" %}
+        <h3>Pregnancy Checks:</h3>
+            {{pregnancyCheck}}
+        {% endif %}
+        <br>
+        <a class="btn btn-primary" href="{{url_for('treatment', cowId=cow.id)}}" role="button">Add</a>
+    </div>
+
+	
+
+	
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    {{ fancy_table('HerdTable', buttons=false) }}
+    {{ fancy_table('Weights', buttons=false) }}
+    {{ fancy_table('Events', buttons=false) }}
+    {{ fancy_table('Treatments', buttons=false) }}
+    {{ fancy_table('PregnancyChecks', buttons=false) }}
+{%- endblock scripts %}

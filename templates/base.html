@@ -1,0 +1,56 @@
+{% extends "bootstrap/base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+{% import 'bootstrap/utils.html' as utils %}
+
+{% macro fancy_table(id, buttons=true) %}
+    <script>
+        $(document).ready( function () {
+            $('#{{id}}').DataTable({
+                colReorder: true,
+                fixedHeader: true,
+                responsive: true,
+                paging: false,
+                scollY: "50%"
+                {% if buttons %}
+                ,
+                dom: 'Bfrtip',
+                buttons: ['copy', 'excel', 'pdf']
+                {% endif %}
+            });
+            $('#{{id}}').css("width", "80%");
+            $('#{{id}}').DataTable().draw();
+        });
+    </script>
+{% endmacro %}
+
+{% block title %}
+    CowBook
+{% endblock %}
+
+{% block navbar %}
+    {{nav.navbar.render()}}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {# application content needs to be provided in the app_content block #}
+        {% block app_content %}{% endblock %}
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script src="{{ url_for('static', filename='moment.js') }}"></script>
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='DataTables/datatables.css')}}">
+    <script type="text/javascript" charset="utf8" src="{{url_for('static', filename='DataTables/datatables.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha256-bqVeqGdJ7h/lYPq6xrPv/YGzMEb6dNxlfiTUHSgRCp8=" crossorigin="anonymous"></script>
+{%- endblock scripts %}

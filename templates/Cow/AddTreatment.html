@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block app_content %}
+{# comment
+<h3>Type</h3>
+<select id="formSelect" class="form-control"  onchange="hideForms(this.value)">
+    <option value="event" selected="selected">Event</option>
+    <option value="#treatmentForm">Treatment</option>
+    <option value="#weightForm">Weight</option>
+    <option value="#pregnancyCheckForm">Pregnancy Check</option>
+</select>
+<br>
+<div id="eventForm">
+    {{ wtf.quick_form(event) }}
+</div>
+<div id="treatmentForm" style="display: none">
+    {{ wtf.quick_form(treatment) }}
+</div>
+<div id="weightForm" style="display: none">
+    {{ wtf.quick_form(weight) }}
+</div>
+<div id="pregnancyCheckForm" style="display: none">
+    {{ wtf.quick_form(pregnancyCheck) }}
+</div>
+#}
+
+<div id="formwrapper">
+    {{ wtf.quick_form(form) }}
+</div>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script>
+
+        function hideForms() {
+            var input = $("#formType")[0].value;
+            console.log($("#formType")[0]);
+            hideAll();
+            if (input == "Treatment") {
+                show(["#lotNo", "#expiration", "#withdrawal", "#dosage", "#unit"]);
+            } else if (input == "Weight") {
+                show(["#weight"]);
+            } else if (input == "Pregnancy Check") {
+                show(["#pregnant"]);
+            }
+        }
+
+        function hideAll() {
+            var forms = ["#lotNo", "#expiration", "#withdrawal", "#dosage", "#unit", "#pregnant", "#weight"];
+            for (var i = 0; i < forms.length; ++i) {
+                $(forms[i]).parent().css("display", "none");
+            }
+        }
+
+        function show(list) {
+            for (var i = 0; i < list.length; ++i) {
+                $(list[i]).parent().css("display", "block");
+            }
+        }
+        $("#formType").change( function() {
+            hideForms();
+        });
+        $(document).ready( function () {
+            hideForms();
+        });
+1   </script>
+{%- endblock scripts %}

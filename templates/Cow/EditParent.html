@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% block app_content %}
+
+<div class="formwrapper">
+    <h2 class="title">Edit {{form.parentType}}</h2>
+    <form method="POST">
+    <select class="form-control" id="id" name="id">
+    </select>
+        <input id="submit" class="btn btn-default" name="submit" type="submit" value="Save">
+    </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        var cow = JSON.parse('{{ cow | tojson | safe }}');
+        $.getJSON('/api/{{form.parentType}}s', function(data) {
+            let element = $("#id")[0];
+            for (var i = 0; i < data.length; i++) {
+                if (cow.id != data[i].id)
+                    element.append(new Option(data[i].name + " #" + data[i].earTag, data[i].id));
+            }
+        })
+    </script>
+{%- endblock scripts %}
