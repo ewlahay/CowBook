@@ -160,3 +160,9 @@ def get_dams():
 @as_json
 def get_sires():
 	return get_all_sires()
+
+
+@app.route('/api/herd')
+@as_json
+def get_herd():
+	return get_all()

@@ -1,1 +1,95 @@
 {% extends "base.html" %}
+
+{% block app_content %}
+<style>
+.card {
+    /* Add shadows to create the "card" effect */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    width: 30%;
+    height: 225px;
+    border-radius: 8px; /* 5px rounded corners */
+    display: inline-block;
+    vertical-align: top;
+    margin: 15px;
+
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+/* Add some padding inside the card container */
+.textContainer {
+  padding: 16px;
+  height: inherit;
+  overflow: auto;
+}
+
+img {
+    border-radius: 8px 0 0 8px;
+    padding-top: 0px;
+    float: left;
+    margin-right: 10px;
+}
+
+</style>
+<input type="range" class="custom-range" min="1" max="40" onchange="updateMargin(this.value)" oninput="updateMargin(this.value)">
+<div id="herdContainer">
+
+</div>
+<template id="cowCard" >
+    <div class="card">
+        <img id="image" src="" style="height:100%">
+        <div class="textContainer">
+            <h3 id="name"></h3>
+            <p id="dob"></p>
+            <p id="tag"></p>
+            <p id="sex"></p>
+            <p id="owner"></p>
+        </div>
+    </div>
+</template>
+
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        function updateMargin(value) {
+            //let value = $(".custom-range")[0].value;
+            console.log(value);
+            $(".card").css("margin", value + "px");
+        }
+
+        var container = $(".container")[0];
+        $(".container").css("width", "95%");
+        function renderCows(data) {
+            var template = $("#cowCard")[0].content.children[0];
+            var body = $("#herdContainer")[0];
+            //console.log(template);
+            for (var i = 0; i < data.length; ++i) {
+                let clone = template.cloneNode(true);
+                let children = clone.children
+                if (data[i].photo != "" && data[i].photo != null) {
+                    children.namedItem("image").src = "/static/Pictures/" + data[i].photo;
+                } else {
+                    //console.log(clone);
+                    clone.style.width = "max-content";
+                }
+                let attributes = children[1].children;
+                //console.log(attributes);
+                attributes[0].innerText = data[i].name;
+                attributes[1].innerText = "DOB: " + data[i].dob;
+                attributes[2].innerText = "Tag #" + data[i].earTag;
+                attributes[3].innerText = "Sex: " + data[i].sex;
+                attributes[4].innerText = "Owner: " + data[i].owner;
+                let cow = data[i];
+                clone.onclick = function() { window.location = window.location.origin + "/herd/" + cow.id;}
+                body.appendChild(clone);
+            }
+        }
+        $.get("/api/herd", renderCows);
+    </script>
+{%- endblock scripts %}
