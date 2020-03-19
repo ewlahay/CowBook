@@ -19,6 +19,7 @@ def navbar():
 		         View('Weights', 'treatments', type='weight'),
 		         View("Pregnancy Checks", 'treatments', type='pregnancyCheck')
 		         ),
+		View("Due Dates", 'view_due_date'),
 		View("Add Cow", 'add_cow')
 	)
 
@@ -37,4 +38,4 @@ if __name__ == '__main__':
 	# database.init_db()
 	json.init_app(app)
 	db.create_all()
-	app.run(debug=True)
+	app.run(debug=True, host='0.0.0.0')

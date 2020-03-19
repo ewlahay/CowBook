@@ -1,27 +1,6 @@
 {% extends "base.html" %}
 {% block app_content %}
-{# comment
-<h3>Type</h3>
-<select id="formSelect" class="form-control"  onchange="hideForms(this.value)">
-    <option value="event" selected="selected">Event</option>
-    <option value="#treatmentForm">Treatment</option>
-    <option value="#weightForm">Weight</option>
-    <option value="#pregnancyCheckForm">Pregnancy Check</option>
-</select>
-<br>
-<div id="eventForm">
-    {{ wtf.quick_form(event) }}
-</div>
-<div id="treatmentForm" style="display: none">
-    {{ wtf.quick_form(treatment) }}
-</div>
-<div id="weightForm" style="display: none">
-    {{ wtf.quick_form(weight) }}
-</div>
-<div id="pregnancyCheckForm" style="display: none">
-    {{ wtf.quick_form(pregnancyCheck) }}
-</div>
-#}
+
 
 <div id="formwrapper">
     {{ wtf.quick_form(form) }}
@@ -41,11 +20,13 @@
                 show(["#weight"]);
             } else if (input == "Pregnancy Check") {
                 show(["#pregnant"]);
+            } else if (input == "Bred") {
+                show(["#sire"]);
             }
         }
 
         function hideAll() {
-            var forms = ["#lotNo", "#expiration", "#withdrawal", "#dosage", "#unit", "#pregnant", "#weight"];
+            var forms = ["#lotNo", "#expiration", "#withdrawal", "#dosage", "#unit", "#pregnant", "#weight", "#sire"];
             for (var i = 0; i < forms.length; ++i) {
                 $(forms[i]).parent().css("display", "none");
             }

@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash
 from flask_json import as_json
-
+import dateutil.parser
 from Forms.Cow.EditParentForm import EditParentForm
 from Models.Cow.CowModel import get_by_id, get_calves, get_all, get_all_dams, get_all_sires
 from Forms.Cow.CowForm import CowForm
@@ -30,6 +30,13 @@ def add_cow():
 	return render_template("/Cow/AddCow.html", form=form)
 
 
+@app.route('/herd/duedates')
+def view_due_date():
+	defaultDate = Treatment.get_next_due_date()
+	print(defaultDate)
+	return render_template("/Cow/DueDates.html", defaultDate=defaultDate)
+
+
 @app.route('/herd/<cowId>')
 def cow(cowId):
 	tempCow = get_by_id(cowId)
@@ -37,13 +44,15 @@ def cow(cowId):
 		return render_template('/Error/404.html', content="Cow {} not found".format(cowId))
 	dam = get_by_id(tempCow.dam_id)
 	sire = get_by_id(tempCow.sire_id)
+
 	calves = CowTable(get_calves(tempCow))
-	weights = Treatment.WeightTable(Treatment.get_weights(tempCow))
-	events = Treatment.EventTable(Treatment.get_events(tempCow))
-	treats = Treatment.TreatmentTable(Treatment.get_treatments(tempCow))
-	pregnancyChecks = Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks(tempCow))
+	weights = Treatment.WeightTable(Treatment.get_weights(tempCow), show_parent=False)
+	events = Treatment.EventTable(Treatment.get_events(tempCow),show_parent=False)
+	treats = Treatment.TreatmentTable(Treatment.get_treatments(tempCow),show_parent=False)
+	pregnancyChecks = Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks(tempCow),show_parent=False)
+	breedings = Treatment.BredTable(Treatment.get_breedings(tempCow),show_parent=False)
 	return render_template("/Cow/Cow.html", cow=tempCow, calves=calves, weights=weights, events=events,
-	                       treatments=treats, pregnancyCheck=pregnancyChecks, dam=dam, sire=sire)
+	                       treatments=treats, pregnancyCheck=pregnancyChecks, breedings=breedings, dam=dam, sire=sire)
 
 
 @app.route('/herd/<cowId>/treatment', methods=["GET", "POST"])
@@ -53,14 +62,15 @@ def treatment(cowId):
 	treatmentForm = Treatment.TreatmentForm()
 	weightForm = Treatment.WeightForm()
 	pregnancyCheckForm = Treatment.PregnancyCheckForm()
+	bredForm = Treatment.BredForm()
 
 	if tempCow is not None:
 		form = Treatment.Form()
-		if tempCow.sex != "cow":
-			form.formType.choices = [("Event", "Event"), ("Treatment", "Treatment"), ("Weight", "Weight")]
-		else:
-			form.formType.choices = [("Event", "Event"), ("Treatment", "Treatment"), ("Weight", "Weight"),
-			                         ("Pregnancy Check", "Pregnancy Check")]
+		# Set choices for form type on frontend
+		form.formType.choices = [("Event", "Event"), ("Treatment", "Treatment"), ("Weight", "Weight")]
+		if tempCow.sex == "cow":
+			form.formType.choices.append(("Pregnancy Check", "Pregnancy Check"))
+			form.formType.choices.append(("Bred", "Bred"))
 		if form.formType.data == "Event":
 			item = eventForm
 		elif form.formType.data == "Treatment":
@@ -69,6 +79,8 @@ def treatment(cowId):
 			item = weightForm
 		elif form.formType.data == "Pregnancy Check":
 			item = pregnancyCheckForm
+		elif form.formType.data == "Bred":
+			item = bredForm
 		else:
 			item = form
 		if item.validate_on_submit():
@@ -76,9 +88,8 @@ def treatment(cowId):
 		else:
 			if request.method == 'POST':
 				form.validate()
-			return render_template("/Cow/AddTreatment.html", cow=tempCow, form=form, event=eventForm,
-			                       treatment=treatmentForm, weight=weightForm, pregnancyCheck=pregnancyCheckForm)
-		return redirect(url_for('herd'))
+			return render_template("/Cow/AddTreatment.html", cow=tempCow, form=form)
+		return redirect(url_for('cow', cowId=cowId))
 	else:
 		return render_template("/Error/404.html")
 
@@ -166,3 +177,18 @@ def get_sires():
 @as_json
 def get_herd():
 	return get_all()
+
+
+@app.route('/api/herd/duedates')
+@as_json
+def get_due_dates():
+	start = request.args.get("start")
+	end = request.args.get("end")
+
+	if start is not None and end is not None:
+		startDate = dateutil.parser.isoparse(start)
+		endDate = dateutil.parser.isoparse(end)
+		dueDates = Treatment.get_due_dates(startDate, endDate)
+		#print(startDate, endDate, dueDates)
+		return dueDates
+	return "error"

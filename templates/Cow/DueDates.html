@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{%- block styles %}
+{{ super() }}
+<link href='/static/fullcalendar/core/main.css' rel='stylesheet' />
+<link href='/static/fullcalendar/daygrid/main.css' rel='stylesheet' />
+
+<script src='/static/fullcalendar/core/main.js'></script>
+<script src='/static/fullcalendar/daygrid/main.js'></script>
+<script src='/static/fullcalendar/timegrid/main.js'></script>
+<script src='/static/fullcalendar/list/main.js'></script>
+<script>
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        plugins: [ 'dayGrid', 'timeGrid', 'list' ],
+        header: { center: 'dayGridMonth,timeGridWeek' }, // buttons for switching between views
+        defaultDate: "{{defaultDate}}",
+        views: {
+            dayGridMonth: {
+                titleFormat: { year: 'numeric', month: '2-digit', day: '2-digit' },
+                defaultDate: "{{defaultDate}}"
+            },
+            list: {
+                type: 'list'
+            }
+        },
+        events: "/api/herd/duedates"
+    });
+
+    calendar.render();
+    //console.log(calendar.view);
+  });
+
+</script>
+{%- endblock styles %}
+
+{% block app_content %}
+<body>
+
+    <div id='calendar'></div>
+
+  </body>
+{% endblock %}

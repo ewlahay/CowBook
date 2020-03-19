@@ -36,6 +36,13 @@
     </div>
 
     <div id="tables">
+        {% if cow.sex == "cow" %}
+        <h3>Breedings</h3>
+            {{breedings}}
+        <h3>Pregnancy Checks:</h3>
+            {{pregnancyCheck}}
+        {% endif %}
+
         {% if cow.sex != "steer"%}
         <h3>Calves:</h3>
             {{calves}}
@@ -46,10 +53,7 @@
             {{events}}
         <h3>Treatments:</h3>
             {{treatments}}
-        {% if cow.sex == "female" %}
-        <h3>Pregnancy Checks:</h3>
-            {{pregnancyCheck}}
-        {% endif %}
+
         <br>
         <a class="btn btn-primary" href="{{url_for('treatment', cowId=cow.id)}}" role="button">Add</a>
     </div>
@@ -66,4 +70,5 @@
     {{ fancy_table('Events', buttons=false) }}
     {{ fancy_table('Treatments', buttons=false) }}
     {{ fancy_table('PregnancyChecks', buttons=false) }}
+    {{ fancy_table('breedingHistory', buttons=false) }}
 {%- endblock scripts %}

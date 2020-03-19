@@ -6,7 +6,7 @@
     /* Add shadows to create the "card" effect */
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
-    width: 30%;
+    #width: 30%;
     height: 225px;
     border-radius: 8px; /* 5px rounded corners */
     display: inline-block;
@@ -32,6 +32,9 @@ img {
     padding-top: 0px;
     float: left;
     margin-right: 10px;
+    max-width: 70%;
+    height: auto;
+    max-height: 100%
 }
 
 </style>
@@ -41,7 +44,7 @@ img {
 </div>
 <template id="cowCard" >
     <div class="card">
-        <img id="image" src="" style="height:100%">
+        <img id="image" src="">
         <div class="textContainer">
             <h3 id="name"></h3>
             <p id="dob"></p>
@@ -59,12 +62,12 @@ img {
     <script>
         function updateMargin(value) {
             //let value = $(".custom-range")[0].value;
-            console.log(value);
+            //console.log(value);
             $(".card").css("margin", value + "px");
         }
 
         var container = $(".container")[0];
-        $(".container").css("width", "95%");
+        $(".container").css("width", "100%");
         function renderCows(data) {
             var template = $("#cowCard")[0].content.children[0];
             var body = $("#herdContainer")[0];
@@ -91,5 +94,13 @@ img {
             }
         }
         $.get("/api/herd", renderCows);
+
+        async function scale() {
+            for (let i = 0; i < 50; i++) {
+                $(".custom-range")[0].value = i;
+                updateMargin(i);
+                await new Promise(r => setTimeout(r, 100));
+            }
+        }
     </script>
 {%- endblock scripts %}
