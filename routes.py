@@ -33,7 +33,6 @@ def add_cow():
 @app.route('/herd/duedates')
 def view_due_date():
 	defaultDate = Treatment.get_next_due_date()
-	print(defaultDate)
 	return render_template("/Cow/DueDates.html", defaultDate=defaultDate)
 
 

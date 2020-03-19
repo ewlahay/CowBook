@@ -280,5 +280,8 @@ def get_due_dates(start, end):
 
 
 def get_next_due_date():
-	first = db.session.query(Bred).order_by(desc(Bred.date)).first()
+	now = datetime.now() - timedelta(288)
+	first = db.session.query(Bred).order_by(desc(Bred.date)).filter(func.date(Bred.date) >= now).first()
+	if first is None:
+		return None
 	return first.date + timedelta(MIN_GESTATION)
