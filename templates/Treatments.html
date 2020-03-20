@@ -2,7 +2,7 @@
 {% block app_content %}
 
 {% for table in tables %}
-    <h2>{{table.get_html_attrs()['id']}}</h2>
+    <h2>{{table.title}}</h2>
     {{table}}
     <br><br>
 {% endfor %}

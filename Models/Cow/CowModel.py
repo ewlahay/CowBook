@@ -1,7 +1,12 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Date, Boolean, Enum
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Date, Boolean, Enum, func
 import json
 import enum
 from datetime import datetime
+
+from sqlalchemy.orm import relationship
+
+from Models.Death import Death
+from Models.Sale import Sale
 from init import db
 
 
@@ -29,14 +34,33 @@ class Cow(db.Model):
 	owner = Column(String, nullable=False)
 	markings = Column(String)
 	photo = Column(String)
+	sale = relationship("Sale", uselist=False, back_populates="cow")
+	death = relationship("Death", uselist=False, back_populates="cow")
 
-	# events = relationship("Event")
 	@property
 	def is_heifer(self):
 		calves = get_calves(self)
 		if len(calves) == 0 and self.sex == "cow":
 			return True
 		return False
+
+	@property
+	def is_sold(self):
+		sale = db.session.query(Sale).filter_by(parent=self.id).first()
+		return sale is not None
+
+	@property
+	def is_dead(self):
+		death = db.session.query(Death).filter_by(parent=self.id).first()
+		return death is not None
+
+	@property
+	def status(self):
+		if self.is_dead:
+			return "dead"
+		if self.is_sold:
+			return "sold"
+		return "{} years old".format(((datetime.now().date() - self.dob).days/365).__round__(2))
 
 	def set_dam_id(self, dam_id):
 		if dam_id == self.id:
@@ -106,6 +130,16 @@ def get_all_dams():
 
 def get_all_sires():
 	return db.session.query(Cow).filter(Cow.sex == "bull").all()
+
+
+def get_by_name(name: str) -> Cow:
+	return db.session.query(Cow).filter(func.lower(Cow.name) == func.lower(name)).first()
+
+
+def get_active():
+	cows = get_all()
+	activeCows = [x for x in cows if not x.is_sold and not x.is_dead]
+	return activeCows
 
 
 def get_all():

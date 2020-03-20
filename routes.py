@@ -1,11 +1,23 @@
 from flask import render_template, request, redirect, url_for, flash
 from flask_json import as_json
 import dateutil.parser
+
+from Forms.BredForm import BredForm
 from Forms.Cow.EditParentForm import EditParentForm
-from Models.Cow.CowModel import get_by_id, get_calves, get_all, get_all_dams, get_all_sires
+from Forms.DeathForm import DeathForm
+from Forms.EventForm import EventForm
+from Forms.PregnancyCheckForm import PregnancyCheckForm
+from Forms.SaleForm import SaleForm
+from Forms.TreatmentForm import TreatmentForm
+from Forms.WeightForm import WeightForm
+from Models.Cow.CowModel import get_by_id, get_calves, get_all, get_all_dams, get_all_sires, get_active
 from Forms.Cow.CowForm import CowForm
 from Models.Cow.CowTable import CowTable
 from Forms.Cow.EditCowForm import EditCowForm
+from Models.Death import get_dead
+from Models.DeathTable import DeathTable
+from Models.Sale import get_sold
+from Models.SoldTable import SoldTable
 from init import app
 from Models import Treatment
 
@@ -17,7 +29,23 @@ def index():
 
 @app.route('/herd')
 def herd():
-	herdTable = CowTable(get_all())
+	tableType = request.args.get("type")
+	# data =
+	types = {
+		"all": get_all,
+		"active": get_active,
+		"sold": get_sold,
+		"dead": get_dead
+	}
+	data = types[tableType]
+	if data is not None:
+		data = data()
+	if tableType == "sold":
+		herdTable = SoldTable(data)
+	elif tableType == "dead":
+		herdTable = DeathTable(data)
+	else:
+		herdTable = CowTable(data)
 	return render_template("Herd.html", table=herdTable)
 
 
@@ -45,31 +73,46 @@ def cow(cowId):
 	sire = get_by_id(tempCow.sire_id)
 
 	calves = CowTable(get_calves(tempCow))
-	weights = Treatment.WeightTable(Treatment.get_weights(tempCow), show_parent=False)
-	events = Treatment.EventTable(Treatment.get_events(tempCow),show_parent=False)
-	treats = Treatment.TreatmentTable(Treatment.get_treatments(tempCow),show_parent=False)
-	pregnancyChecks = Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks(tempCow),show_parent=False)
-	breedings = Treatment.BredTable(Treatment.get_breedings(tempCow),show_parent=False)
+	weights = Treatment.WeightTable(Treatment.get_weights(tempCow))
+	events = Treatment.EventTable(Treatment.get_events(tempCow))
+	# del events.parent
+	treats = Treatment.TreatmentTable(Treatment.get_treatments(tempCow))
+	# del treats.parent
+	pregnancyChecks = Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks(tempCow))
+	# del pregnancyChecks.parent
+	breedings = Treatment.BredTable(Treatment.get_breedings(tempCow))
+	# del breedings.parent
 	return render_template("/Cow/Cow.html", cow=tempCow, calves=calves, weights=weights, events=events,
 	                       treatments=treats, pregnancyCheck=pregnancyChecks, breedings=breedings, dam=dam, sire=sire)
 
 
-@app.route('/herd/<cowId>/treatment', methods=["GET", "POST"])
+@app.route('/herd/<cowId>/addEvent', methods=["GET", "POST"])
 def treatment(cowId):
 	tempCow = get_by_id(cowId)
-	eventForm = Treatment.EventForm()
-	treatmentForm = Treatment.TreatmentForm()
-	weightForm = Treatment.WeightForm()
-	pregnancyCheckForm = Treatment.PregnancyCheckForm()
-	bredForm = Treatment.BredForm()
-
 	if tempCow is not None:
+		# Single form with every possible field
 		form = Treatment.Form()
 		# Set choices for form type on frontend
-		form.formType.choices = [("Event", "Event"), ("Treatment", "Treatment"), ("Weight", "Weight")]
+		form.formType.choices = [("Event", "Event"), ("Treatment", "Treatment"), ("Weight", "Weight"), ("Sale", "Sale"), ("Death", "Death")]
 		if tempCow.sex == "cow":
 			form.formType.choices.append(("Pregnancy Check", "Pregnancy Check"))
 			form.formType.choices.append(("Bred", "Bred"))
+		form.formType.choices.sort(key=lambda x: x[0])
+		formType = {
+			"Event": EventForm,
+			"Treatment": TreatmentForm,
+			"Weight": WeightForm,
+			"Pregnancy Check": PregnancyCheckForm,
+			"Bred": BredForm,
+			"Sale": SaleForm,
+			"Death": DeathForm,
+		}
+		item = formType.get(form.formType.data)
+		if item is None:
+			item = form
+		else:
+			item = item()
+		"""
 		if form.formType.data == "Event":
 			item = eventForm
 		elif form.formType.data == "Treatment":
@@ -80,8 +123,11 @@ def treatment(cowId):
 			item = pregnancyCheckForm
 		elif form.formType.data == "Bred":
 			item = bredForm
+		elif form.formType.data == "Sale":
+			item = saleForm
 		else:
 			item = form
+		"""
 		if item.validate_on_submit():
 			item.save(cowId)
 		else:
@@ -138,7 +184,8 @@ def edit_sire(cowId):
 	return render_template("/Cow/EditParent.html", cow=newCow, form=form)
 
 
-def event(cowId):
+@app.route('/herd/<cowId>/sell', methods=["GET", "POST"])
+def sell_cow(cowId):
 	pass
 
 
@@ -150,6 +197,7 @@ def treatments():
 		tables.append(Treatment.EventTable(Treatment.get_events()))
 		tables.append(Treatment.TreatmentTable(Treatment.get_treatments()))
 		tables.append(Treatment.WeightTable(Treatment.get_weights()))
+		tables.append(Treatment.BredTable(Treatment.get_breedings()))
 		tables.append(Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks()))
 	elif treatType == "medical":
 		tables.append(Treatment.TreatmentTable(Treatment.get_treatments()))
@@ -157,37 +205,6 @@ def treatments():
 		tables.append(Treatment.WeightTable(Treatment.get_weights()))
 	elif treatType == "pregnancyCheck":
 		tables.append(Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks()))
+	elif treatType == "breeding":
+		tables.append(Treatment.BredTable(Treatment.get_breedings()))
 	return render_template("Treatments.html", tables=tables)
-
-
-@app.route('/api/dams')
-@as_json
-def get_dams():
-	return get_all_dams()
-
-
-@app.route('/api/sires')
-@as_json
-def get_sires():
-	return get_all_sires()
-
-
-@app.route('/api/herd')
-@as_json
-def get_herd():
-	return get_all()
-
-
-@app.route('/api/herd/duedates')
-@as_json
-def get_due_dates():
-	start = request.args.get("start")
-	end = request.args.get("end")
-
-	if start is not None and end is not None:
-		startDate = dateutil.parser.isoparse(start)
-		endDate = dateutil.parser.isoparse(end)
-		dueDates = Treatment.get_due_dates(startDate, endDate)
-		#print(startDate, endDate, dueDates)
-		return dueDates
-	return "error"

@@ -4,6 +4,7 @@ from flask_nav.elements import Navbar, View, Subgroup, Link, Text, Separator
 from Models.Cow.CowModel import Cow
 from init import app, nav, db
 import routes
+import api
 
 
 # Navigation bar
@@ -12,11 +13,18 @@ def navbar():
 	return Navbar(
 		'CowBook',
 		View('Home', 'index'),
-		View('Herd', "herd"),
+		Subgroup('Herd',
+		         View("All", 'herd', type='all'),
+		         View("Active", 'herd', type='active'),
+		         View("Sold", 'herd', type='sold'),
+		         Separator(),
+		         View("Dead", 'herd', type='dead')
+		         ),
 		Subgroup('Treatments',
 		         View('All', 'treatments', type='all'),
 		         View('Medical', 'treatments', type='medical'),
 		         View('Weights', 'treatments', type='weight'),
+		         View("Breeding Records", 'treatments', type='breeding'),
 		         View("Pregnancy Checks", 'treatments', type='pregnancyCheck')
 		         ),
 		View("Due Dates", 'view_due_date'),
@@ -35,7 +43,6 @@ def custom_encoder(o):
 
 
 if __name__ == '__main__':
-	# database.init_db()
 	json.init_app(app)
 	db.create_all()
 	app.run(debug=True, host='0.0.0.0')

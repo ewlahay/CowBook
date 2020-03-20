@@ -38,7 +38,16 @@ img {
 }
 
 </style>
-<input type="range" class="custom-range" min="1" max="40" onchange="updateMargin(this.value)" oninput="updateMargin(this.value)">
+ <span class="form-group" style="float: right">
+  <label for="filter">Filter by:</label>
+  <select class="form-control" id="filter" onchange="updateContent(this.value)" style="width: auto">
+    <option value="active">Active</option>
+    <option value="all">All</option>
+    <option value="sold">Sold</option>
+    <option value="dead">Dead</option>
+  </select>
+</span>
+
 <div id="herdContainer">
 
 </div>
@@ -68,9 +77,11 @@ img {
 
         var container = $(".container")[0];
         $(".container").css("width", "100%");
+
         function renderCows(data) {
             var template = $("#cowCard")[0].content.children[0];
             var body = $("#herdContainer")[0];
+            body.textContent = '';
             //console.log(template);
             for (var i = 0; i < data.length; ++i) {
                 let clone = template.cloneNode(true);
@@ -101,6 +112,10 @@ img {
                 updateMargin(i);
                 await new Promise(r => setTimeout(r, 100));
             }
+        }
+
+        function updateContent(value) {
+            $.get('/api/herd?filter=' + value, renderCows);
         }
     </script>
 {%- endblock scripts %}

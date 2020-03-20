@@ -16,7 +16,8 @@
             Sex: {{cow.sex}}<br>
             Carrier: {{cow.carrier}}<br>
             Owner: {{cow.owner}}<br>
-            Markings: {{cow.markings}}<br><br>
+            Markings: {{cow.markings}}<br>
+            Status: {{cow.status}}<br>
 
             {% if dam or sire %}
             Parents:<br>
@@ -55,7 +56,7 @@
             {{treatments}}
 
         <br>
-        <a class="btn btn-primary" href="{{url_for('treatment', cowId=cow.id)}}" role="button">Add</a>
+        <a class="btn btn-primary" href="{{url_for('treatment', cowId=cow.id)}}" role="button">Add Event</a>
     </div>
 
 	

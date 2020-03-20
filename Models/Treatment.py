@@ -1,12 +1,14 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime, Date, Boolean, and_, func, desc
-from sqlalchemy.ext.declarative import declared_attr
-from flask_wtf import FlaskForm
-from wtforms.fields import SubmitField, StringField, IntegerField, BooleanField, DateField, FloatField, SelectField
-from wtforms_alchemy import model_form_factory
-from flask_table import Table, Col, LinkCol, BoolCol
 from datetime import datetime, timedelta
 
+from flask_table import Table, Col, LinkCol, BoolCol
+from flask_wtf import FlaskForm
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Date, Boolean, and_, func, desc
+from sqlalchemy.ext.declarative import declared_attr
+from wtforms.fields import SubmitField, StringField, IntegerField, BooleanField, DateField, FloatField, SelectField
+from wtforms_alchemy import model_form_factory
+
 from Models.Cow import CowModel
+from Util.DBLink import CowNameLinkCol
 from init import db
 
 MIN_GESTATION = 279
@@ -41,41 +43,27 @@ class Event(Base, db.Model):
 	pass
 
 
-class EventForm(ModelForm):
-	class Meta:
-		model = Event
-
-	submit = SubmitField()
-
-	def save(self, parent):
-		event = Event(self.date.data, self.type.data, parent, self.notes.data)
-		db.session.add(event)
-		db.session.commit()
-		return event
-
-
 class EventTable(Table):
 	table_id = "Events"
-
+	title = table_id
+	"""
 	@property
 	def parent(self):
+		print("Getting parent!")
 		if self.show_parent is True:
 			return LinkCol("Cow", 'cow', url_kwargs=dict(cowId='parent'), attr='parent')
 		else:
 			return None
-
+	"""
+	parent = LinkCol("Cow", 'cow', url_kwargs=dict(cowId='parent'), attr='parent')
 	date = Col("Date")
 	type = Col("Type")
 	notes = Col("Notes")
 
 	def __init__(self, items, classes=None, thead_classes=None, sort_by=None, sort_reverse=False, no_items=None,
 	             table_id=None, border=None, html_attrs=None, show_parent=True):
-		super().__init__(items, classes, thead_classes, sort_by, sort_reverse, no_items, table_id, border, html_attrs)
 		self.show_parent = show_parent
-
-	@parent.setter
-	def parent(self, value):
-		self._parent = value
+		super().__init__(items, classes, thead_classes, sort_by, sort_reverse, no_items, table_id, border, html_attrs)
 
 
 class Treatment(Base, db.Model):
@@ -94,26 +82,9 @@ class Treatment(Base, db.Model):
 		self.unit = unit
 
 
-class TreatmentForm(ModelForm):
-	''''lotNo = StringField("Lot #")
-	expiration = DateField("Expiration")
-	withdrawal = IntegerField("Withdrawal (Days)")
-	dosage = IntegerField("Dosage")
-	unit = StringField("Unit")'''
-
-	class Meta:
-		model = Treatment
-
-	def save(self, parent):
-		treatment = Treatment(self.date.data, self.type.data, parent, self.notes.data, self.lotNo.data,
-		                      self.expiration.data, self.withdrawal.data, self.dosage.data, self.unit.data)
-		db.session.add(treatment)
-		db.session.commit()
-		return treatment
-
-
 class TreatmentTable(EventTable):
 	table_id = "Treatments"
+	title = "Medical"
 	lotNo = Col("Lot #")
 	expiration = Col("Expiration")
 	withdrawal = Col("Withdrawal time (Days)")
@@ -132,21 +103,9 @@ class Weight(Base, db.Model):
 		return "weight: {} date: {} parent: {}".format(self.weight, self.date, self.parent)
 
 
-class WeightForm(ModelForm):
-	class Meta:
-		model = Weight
-
-	# weight = FloatField("Weight")
-
-	def save(self, parent):
-		weight = Weight(self.date.data, self.type.data, parent, self.notes.data, self.weight.data)
-		db.session.add(weight)
-		db.session.commit()
-		return weight
-
-
 class WeightTable(EventTable):
 	table_id = "Weights"
+	title = table_id
 	weight = Col("Weight")
 
 
@@ -158,20 +117,9 @@ class PregnancyCheck(Base, db.Model):
 		self.pregnant = pregnant
 
 
-class PregnancyCheckForm(ModelForm):
-	# pregnant = BooleanField("Pregnant")
-	class Meta:
-		model = PregnancyCheck
-
-	def save(self, parent):
-		pregnancyCheck = PregnancyCheck(self.date.data, self.type.data, parent, self.notes.data, self.pregnant.data)
-		db.session.add(pregnancyCheck)
-		db.session.commit()
-		return pregnancyCheck
-
-
 class PregnancyCheckTable(EventTable):
 	table_id = "PregnancyChecks"
+	title = "Pregnancy Checks"
 	pregnant = BoolCol("Pregnant")
 
 
@@ -183,27 +131,16 @@ class Bred(Base, db.Model):
 		self.sire = sire
 
 
-class BredForm(ModelForm):
-	class Meta:
-		model = Bred
-
-	def save(self, parent):
-		bred = Bred(self.date.data, self.type.data, parent, self.notes.data, self.sire.data)
-		db.session.add(bred)
-		db.session.commit()
-		return Bred
-
-
 class BredTable(EventTable):
 	table_id = "breedingHistory"
-	sire = Col("Sire")
+	title = "Breeding History"
+	sire = CowNameLinkCol("Sire")
 
 
 class Form(FlaskForm):
 	formType = SelectField("Type")
 	date = DateField("Date", render_kw={"value": datetime.now().date().isoformat(), "type": "date"})
 	type = StringField("Type")
-	notes = StringField("Notes")
 
 	lotNo = StringField("Lot #")
 	expiration = DateField("Expiration", render_kw={"type": "date"})
@@ -212,9 +149,16 @@ class Form(FlaskForm):
 	unit = StringField("Unit")
 
 	weight = FloatField("Weight")
+	perPound = FloatField("Per Pound")
+	total = FloatField("Total")
 
 	pregnant = BooleanField("Pregnant")
 	sire = StringField("Sire")
+
+	notes = StringField("Notes")
+
+	cause = StringField("Cause of Death")
+
 	submit = SubmitField("Save")
 
 
@@ -257,19 +201,18 @@ def get_breedings(tempCow=None):
 
 
 def get_due_dates(start, end):
-
+	"""Returns a list of due dates calculated as breeding date + 279 days and ending at breeding date + 287 days."""
 	dates = db.session.query(Bred).filter(
 		and_(
 			func.date(Bred.date) >= start - timedelta(days=288), func.date(Bred.date) <= end - timedelta(days=MIN_GESTATION)
 		)
 	)
-	#dates = db.session.query(Bred).filter(Bred.date.between(start, end)).all()
 	dueDates = []
 	for date in dates:
 		tempCow = CowModel.get_by_id(date.parent)
 		dueDates.append(
 			{
-				'title': tempCow.name,
+				'title': "{} due to give birth".format(tempCow.name),
 				'allDay': True,
 				'url': '/herd/{}'.format(date.parent),
 				'start': date.date + timedelta(days=MIN_GESTATION),

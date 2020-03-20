@@ -12,21 +12,33 @@
 
         function hideForms() {
             var input = $("#formType")[0].value;
-            console.log($("#formType")[0]);
+            //console.log($("#formType")[0]);
             hideAll();
-            if (input == "Treatment") {
-                show(["#lotNo", "#expiration", "#withdrawal", "#dosage", "#unit"]);
-            } else if (input == "Weight") {
-                show(["#weight"]);
-            } else if (input == "Pregnancy Check") {
-                show(["#pregnant"]);
-            } else if (input == "Bred") {
-                show(["#sire"]);
+            switch(input) {
+                case "Treatment":
+                    show(["#lotNo", "#expiration", "#withdrawal", "#dosage", "#unit"]);
+                    break;
+                case "Weight":
+                    show(["#weight"]);
+                    break;
+                case "Pregnancy Check":
+                    show(["#pregnant"]);
+                    break;
+                case "Bred":
+                    show(["#sire"]);
+                    break;
+                case "Sale":
+                    show(["#weight", "#perPound", "total"]);
+                    break;
+                case "Death":
+                    show(["#cause"]);
+                    break;
+
             }
         }
 
         function hideAll() {
-            var forms = ["#lotNo", "#expiration", "#withdrawal", "#dosage", "#unit", "#pregnant", "#weight", "#sire"];
+            var forms = ["#lotNo", "#expiration", "#withdrawal", "#dosage", "#unit", "#pregnant", "#weight", "#sire", "#perPound", "#total", "#cause"];
             for (var i = 0; i < forms.length; ++i) {
                 $(forms[i]).parent().css("display", "none");
             }
@@ -37,11 +49,62 @@
                 $(list[i]).parent().css("display", "block");
             }
         }
+
         $("#formType").change( function() {
             hideForms();
         });
         $(document).ready( function () {
             hideForms();
+        });
+
+        function calculateValues() {
+            var weight = $("#weight")[0].value;
+            var perPound = $("#perPound")[0].value;
+            var total = $("#total")[0].value;
+            if (weight != "" && perPound != "") {
+                $("#total")[0].value = (perPound * weight).toFixed(2);
+            } else if (weight != "" && total != "") {
+                $("#perPound")[0].value = (total / weight).toFixed(2);
+            } else if (total != "" && perPound != "") {
+                $("#weight")[0].value = (total/perPound).toFixed(2);
+            }
+        }
+
+        $("#weight").change( function() {
+            var weight = $("#weight")[0].value;
+            var perPound = $("#perPound")[0].value;
+            var total = $("#total")[0].value;
+            if (weight != "") {
+                if (perPound != "") {
+                    $("#total")[0].value = (perPound * weight).toFixed(2);
+                } else if (total != "") {
+                    $("#perPound")[0].value = (total / weight).toFixed(2);
+                }
+            }
+        });
+        $("#perPound").change( function() {
+            var weight = $("#weight")[0].value;
+            var perPound = $("#perPound")[0].value;
+            var total = $("#total")[0].value;
+            if (perPound != "") {
+                if (weight != "") {
+                    $("#total")[0].value = (perPound * weight).toFixed(2);
+                } else if (total != "") {
+                    $("#weight")[0].value = (total/perPound).toFixed(2);
+                }
+            }
+        });
+        $("#total").change( function() {
+            var weight = $("#weight")[0].value;
+            var perPound = $("#perPound")[0].value;
+            var total = $("#total")[0].value;
+            if (total != "") {
+                if (weight != "") {
+                    $("#perPound")[0].value = (total / weight).toFixed(2);
+                } else if (perPound != "") {
+                    $("#weight")[0].value = (total/perPound).toFixed(2);
+                }
+            }
         });
 1   </script>
 {%- endblock scripts %}
