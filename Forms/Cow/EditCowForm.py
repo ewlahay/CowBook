@@ -32,7 +32,6 @@ class EditCowForm(CowForm):
 		else:
 			raise Exception("Cow not found!")
 		filename = self.save_photo()
-		print(filename)
 		if filename is not None:
 			cow.photo = filename
 		db.session.add(cow)

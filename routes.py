@@ -35,9 +35,13 @@ def herd():
 		"all": get_all,
 		"active": get_active,
 		"sold": get_sold,
-		"dead": get_dead
+		"dead": get_dead,
 	}
-	data = types[tableType]
+	try:
+		data = types[tableType]
+	except KeyError:
+		return render_template("Herd.html", table=CowTable(get_all()))
+
 	if data is not None:
 		data = data()
 	if tableType == "sold":
@@ -46,7 +50,7 @@ def herd():
 		herdTable = DeathTable(data)
 	else:
 		herdTable = CowTable(data)
-	return render_template("Herd.html", table=herdTable)
+	return render_template("Herd.html", table=herdTable, type=tableType)
 
 
 @app.route('/herd/add', methods=["GET", "POST"])
@@ -75,13 +79,11 @@ def cow(cowId):
 	calves = CowTable(get_calves(tempCow))
 	weights = Treatment.WeightTable(Treatment.get_weights(tempCow))
 	events = Treatment.EventTable(Treatment.get_events(tempCow))
-	# del events.parent
 	treats = Treatment.TreatmentTable(Treatment.get_treatments(tempCow))
-	# del treats.parent
 	pregnancyChecks = Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks(tempCow))
-	# del pregnancyChecks.parent
 	breedings = Treatment.BredTable(Treatment.get_breedings(tempCow))
 	# del breedings.parent
+
 	return render_template("/Cow/Cow.html", cow=tempCow, calves=calves, weights=weights, events=events,
 	                       treatments=treats, pregnancyCheck=pregnancyChecks, breedings=breedings, dam=dam, sire=sire)
 
@@ -93,7 +95,8 @@ def treatment(cowId):
 		# Single form with every possible field
 		form = Treatment.Form()
 		# Set choices for form type on frontend
-		form.formType.choices = [("Event", "Event"), ("Treatment", "Treatment"), ("Weight", "Weight"), ("Sale", "Sale"), ("Death", "Death")]
+		form.formType.choices = [("Event", "Event"), ("Treatment", "Treatment"), ("Weight", "Weight"), ("Sale", "Sale"),
+		                         ("Death", "Death")]
 		if tempCow.sex == "cow":
 			form.formType.choices.append(("Pregnancy Check", "Pregnancy Check"))
 			form.formType.choices.append(("Bred", "Bred"))
@@ -112,22 +115,6 @@ def treatment(cowId):
 			item = form
 		else:
 			item = item()
-		"""
-		if form.formType.data == "Event":
-			item = eventForm
-		elif form.formType.data == "Treatment":
-			item = treatmentForm
-		elif form.formType.data == "Weight":
-			item = weightForm
-		elif form.formType.data == "Pregnancy Check":
-			item = pregnancyCheckForm
-		elif form.formType.data == "Bred":
-			item = bredForm
-		elif form.formType.data == "Sale":
-			item = saleForm
-		else:
-			item = form
-		"""
 		if item.validate_on_submit():
 			item.save(cowId)
 		else:
@@ -193,13 +180,7 @@ def sell_cow(cowId):
 def treatments():
 	treatType = request.args.get("type")
 	tables = []
-	if treatType == "all":
-		tables.append(Treatment.EventTable(Treatment.get_events()))
-		tables.append(Treatment.TreatmentTable(Treatment.get_treatments()))
-		tables.append(Treatment.WeightTable(Treatment.get_weights()))
-		tables.append(Treatment.BredTable(Treatment.get_breedings()))
-		tables.append(Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks()))
-	elif treatType == "medical":
+	if treatType == "medical":
 		tables.append(Treatment.TreatmentTable(Treatment.get_treatments()))
 	elif treatType == "weight":
 		tables.append(Treatment.WeightTable(Treatment.get_weights()))
@@ -207,4 +188,11 @@ def treatments():
 		tables.append(Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks()))
 	elif treatType == "breeding":
 		tables.append(Treatment.BredTable(Treatment.get_breedings()))
-	return render_template("Treatments.html", tables=tables)
+	else:
+		treatType = "all"
+		tables.append(Treatment.EventTable(Treatment.get_events()))
+		tables.append(Treatment.TreatmentTable(Treatment.get_treatments()))
+		tables.append(Treatment.WeightTable(Treatment.get_weights()))
+		tables.append(Treatment.BredTable(Treatment.get_breedings()))
+		tables.append(Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks()))
+	return render_template("Treatments.html", tables=tables, treat=treatType)

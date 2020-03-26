@@ -34,13 +34,13 @@
             <label for="photo">
                 {% if cow.photo %}
                     <div  id="cssfade">
-                        <img src="{{'/static/Pictures/' + cow.photo}}" height="200" style="float:left; margin-right:10px">
+                        <img id="output" src="{{'/static/Pictures/small/' + cow.photo}}" height="200" style="float:left; margin-right:10px">
                     </div>
                 {% else %}
-                    <img  src="/static/Assets/uploadphoto.png" height="200" style="float:left; margin-right:10px">
+                    <img  id="output" src="/static/Assets/uploadphoto.png" height="200" style="float:left; margin-right:10px">
                 {% endif %}
             </label>
-            <input id="photo" name="photo" type="file"/>
+            <input id="photo" accept="image/*" name="photo" type="file" onchange="loadFile(event)"/>
         </div>
         <div id="cowInfo">
             <h3>
@@ -66,5 +66,10 @@
 
 {% block scripts %}
     {{ super() }}
-
+    <script>
+    var loadFile = function(event) {
+        var image = document.getElementById('output');
+        image.src = URL.createObjectURL(event.target.files[0]);
+    };
+    </script>
 {%- endblock scripts %}

@@ -36,6 +36,9 @@
 </script>
 {%- endblock styles %}
 
+{% block title %}
+    Due Dates
+{% endblock %}
 {% block app_content %}
 <body>
     <a class="btn btn-primary" href="{{url_for('export_due_dates')}}" role="button" style="float: right; margin-left: 0.75em">Export</a>

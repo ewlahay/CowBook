@@ -62,6 +62,7 @@ class Cow(db.Model):
 			return "sold"
 		return "{} years old".format(((datetime.now().date() - self.dob).days/365).__round__(2))
 
+
 	def set_dam_id(self, dam_id):
 		if dam_id == self.id:
 			raise ValueError("Can't set as own mother")

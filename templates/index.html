@@ -87,7 +87,7 @@ img {
                 let clone = template.cloneNode(true);
                 let children = clone.children
                 if (data[i].photo != "" && data[i].photo != null) {
-                    children.namedItem("image").src = "/static/Pictures/" + data[i].photo;
+                    children.namedItem("image").src = "/static/Pictures/small/" + data[i].photo;
                 } else {
                     //console.log(clone);
                     clone.style.width = "max-content";

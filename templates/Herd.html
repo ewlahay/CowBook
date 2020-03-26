@@ -3,6 +3,10 @@
 {{table}}
 {% endblock %}
 
+{% block title %}
+    Herd - {{type}}
+{% endblock %}
+
 {% block scripts %}
     {{ super() }}
     {{ fancy_table('HerdTable') }}

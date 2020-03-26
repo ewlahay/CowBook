@@ -1,12 +1,31 @@
+import string
+
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from werkzeug.utils import secure_filename
 from wtforms.fields import SubmitField, DateField, StringField
 from wtforms_alchemy import model_form_factory
-
+from PIL import Image
 from Models.Cow.CowModel import Cow
 from init import db
+import random
+from os import path
 ModelForm = model_form_factory(FlaskForm)
+
+IMAGE_SIZE = 600
+IMAGE_FORMAT = ".jpeg"
+
+
+def get_filename() -> str:
+	"""Returns an unused filename for an image"""
+	rand = get_random_string()
+	while path.exists(rand + IMAGE_FORMAT):
+		rand = get_random_string()
+	return rand
+
+
+def get_random_string() -> str:
+	return ''.join([random.choice(string.ascii_letters + string.digits) for n in range(32)])
 
 
 class CowForm(ModelForm):
@@ -23,10 +42,22 @@ class CowForm(ModelForm):
 	# dob = DateField('dob', format='%Y-%m-%d')
 	def save_photo(self):
 		if self.photo.data:
-			filename = secure_filename(self.photo.data.filename)
-			self.photo.data.save('static/Pictures/' + filename)
-			print(filename)
-			return filename
+			#filename = secure_filename(self.photo.data.filename)
+			#self.photo.data.save('Data/temp/{}'.format(filename))
+			image = Image.open(self.photo.data)
+			filename = get_filename()
+			exif = image.info['exif']
+			image.save('static/Pictures/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:], exif=exif)
+			width, height = image.size
+
+			if width > height:
+				size = (IMAGE_SIZE, height/width * IMAGE_SIZE)
+			else:
+				size = (width/height, IMAGE_SIZE)
+			image.thumbnail(size)
+
+			image.save('static/Pictures/small/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:], exif=exif)
+			return filename + IMAGE_FORMAT
 		return None
 
 	def save(self):
