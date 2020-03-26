@@ -1,6 +1,6 @@
 /venv/
 /dist/
-/Data/
+/CowBook/Data/
 /CowBook.egg-info/
 /build/
 /.idea/
@@ -8,5 +8,5 @@
 /static/Pictures/
 /CowBook.egg-info/
 /CowBook.egg-info/
-/Data/
+/CowBook/Data/
 /dist/
