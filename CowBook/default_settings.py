@@ -1,0 +1,8 @@
+DEBUG = True
+TESTING = True
+SQLALCHEMY_DATABASE_URI = 'sqlite:///Data/test.db'
+SQLALCHEMY_TRACK_MODIFICATIONS = False
+MAIL_SERVER = 'smtp.gmail.com'
+MAIL_PORT = 465
+MAIL_USE_SSL = True
+SECRET_KEY = 'moo'

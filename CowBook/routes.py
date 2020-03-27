@@ -1,4 +1,6 @@
-from flask import render_template, request, redirect, url_for, flash
+import flask_login
+from flask import render_template, request, redirect, url_for, flash, abort, session
+from flask_security import login_required, current_user
 
 from CowBook.Forms.BredForm import BredForm
 from CowBook.Forms.Cow.EditParentForm import EditParentForm
@@ -20,9 +22,20 @@ from CowBook.init import app
 from CowBook.Models import Treatment
 
 
+@app.context_processor
+def inject_user():
+	return dict(user=current_user)
+
+
 @app.route('/')
 def index():
 	return render_template("index.html")
+
+
+@app.route("/user")
+@login_required
+def user():
+	return render_template("security/User.html")
 
 
 @app.route('/herd')
@@ -52,6 +65,7 @@ def herd():
 
 
 @app.route('/herd/add', methods=["GET", "POST"])
+@login_required
 def add_cow():
 	form = CowForm()
 	if form.validate_on_submit():
@@ -87,6 +101,7 @@ def cow(cowId):
 
 
 @app.route('/herd/<cowId>/addEvent', methods=["GET", "POST"])
+@login_required
 def treatment(cowId):
 	tempCow = get_by_id(cowId)
 	if tempCow is not None:
@@ -125,6 +140,7 @@ def treatment(cowId):
 
 
 @app.route('/herd/<cowId>/edit', methods=["GET", "POST"])
+@login_required
 def edit_cow(cowId):
 	tempCow = get_by_id(cowId)
 	if tempCow is None:
@@ -138,6 +154,7 @@ def edit_cow(cowId):
 
 
 @app.route('/herd/<cowId>/edit/dam', methods=["GET", "POST"])
+@login_required
 def edit_dam(cowId):
 	newCow = get_by_id(cowId)
 	if newCow is None:
@@ -154,6 +171,7 @@ def edit_dam(cowId):
 
 
 @app.route('/herd/<cowId>/edit/sire', methods=["GET", "POST"])
+@login_required
 def edit_sire(cowId):
 	newCow = get_by_id(cowId)
 	if newCow is None:
@@ -167,11 +185,6 @@ def edit_sire(cowId):
 			return render_template("/Cow/EditParent.html", cow=newCow, form=form)
 		return redirect(url_for('cow', cowId=cowId))
 	return render_template("/Cow/EditParent.html", cow=newCow, form=form)
-
-
-@app.route('/herd/<cowId>/sell', methods=["GET", "POST"])
-def sell_cow(cowId):
-	pass
 
 
 @app.route('/herd/treatments')

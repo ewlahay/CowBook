@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+<label>Email: </label>
+{{user.email}}<br>
+<a href="/change">Change Password</a><br>
+<a href="/logout">Logout</a><br>
+{% endblock %}
+
+{% block title %}
+    User Management
+{% endblock %}

@@ -1,15 +1,23 @@
-from flask_json import FlaskJSON
-from flask_nav.elements import Navbar, View, Subgroup, Separator
+import flask_login
+from flask_admin.contrib.sqla import ModelView
+from sqlalchemy.exc import IntegrityError
 
+from flask_json import FlaskJSON
+import flask_security.core as core
+from flask_nav.elements import Navbar, View, Subgroup, Separator, Link
+from flask_mail import Mail, Message
+from flask_security import SQLAlchemyUserDatastore, Security
 from CowBook.Models.Cow.CowModel import Cow
+from CowBook.Models.User import User, Role, get_user
 from CowBook.init import app, nav, db
 from CowBook import routes
 from CowBook import api
 
+
 # Navigation bar
 @nav.navigation()
 def navbar():
-	return Navbar(
+	navy = Navbar(
 		'CowBook',
 		View('Home', 'index'),
 		Subgroup('Herd',
@@ -27,12 +35,31 @@ def navbar():
 		         View("Pregnancy Checks", 'treatments', type='pregnancyCheck')
 		         ),
 		View("Due Dates", 'view_due_date'),
-		View("Add Cow", 'add_cow')
 	)
+	if core.current_user.is_authenticated:
+		navy.items.append(View("Add Cow", 'add_cow'))
+		navy.items.append(View("User", "user"))
+		navy.items.append(Link("Logout", "/logout"))
+	else:
+		navy.items.append(Link("Login", "/login"))
+	return navy
 
 
 nav.init_app(app)
 json = FlaskJSON()
+userDatastore = SQLAlchemyUserDatastore(db, User, Role)
+security = Security(app, userDatastore)
+mail = Mail(app)
+
+
+@app.before_first_request
+def create_user():
+	# init_db()
+	userDatastore.create_user(email=app.config["EMAIL"], password=app.config["PASSWORD"])
+	try:
+		db.session.commit()
+	except IntegrityError:
+		db.session.rollback()
 
 
 @json.encoder

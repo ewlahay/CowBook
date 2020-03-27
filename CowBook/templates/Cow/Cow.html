@@ -11,9 +11,11 @@
         </a>
     {% endif %}
     <span style="float: right">
+        {% if current_user.is_authenticated %}
         {{ utils.form_button(url_for('edit_dam', cowId=cow.id), "{} Dam".format("Edit" if dam else "Add"), method='get', class="btn btn-{}".format("default" if dam else "primary")) }}
         {{ utils.form_button(url_for('edit_sire', cowId=cow.id), "{} Sire".format("Edit" if sire else "Add"), method='get', class="btn btn-{}".format("default" if sire else "primary")) }}
         {{ utils.form_button(url_for('edit_cow', cowId=cow.id), "Edit", method='get', class="btn btn-default") }}
+        {% endif %}
     </span>
     <div id="cowInfo">
         <h3>
@@ -63,7 +65,9 @@
             {{treatments}}
 
         <br>
+        {% if current_user.is_authenticated %}
         <a class="btn btn-primary" href="{{url_for('treatment', cowId=cow.id)}}" role="button">Add Event</a>
+        {% endif %}
     </div>
 
 	
