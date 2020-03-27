@@ -41,24 +41,20 @@ class CowForm(ModelForm):
 	# dob = DateField('dob', format='%Y-%m-%d')
 	def save_photo(self):
 		if self.photo.data:
-			#filename = secure_filename(self.photo.data.filename)
-			#self.photo.data.save('Data/temp/{}'.format(filename))
 			image = Image.open(self.photo.data)
 			filename = get_filename()
-			try:
-				exif = image.info['exif']
-			except KeyError:
-				exif = None
-			image.save('static/Pictures/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:], exif=exif)
+
+			# exif = image.info['exif']
+			image.save('static/Pictures/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
 			width, height = image.size
 
 			if width > height:
-				size = (IMAGE_SIZE, height/width * IMAGE_SIZE)
+				size = (IMAGE_SIZE, height / width * IMAGE_SIZE)
 			else:
-				size = (width/height, IMAGE_SIZE)
+				size = (width / height, IMAGE_SIZE)
 			image.thumbnail(size)
 
-			image.save('static/Pictures/small/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:], exif=exif)
+			image.save('static/Pictures/small/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
 			return filename + IMAGE_FORMAT
 		return None
 
