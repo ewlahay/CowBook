@@ -45,7 +45,10 @@ class CowForm(ModelForm):
 			#self.photo.data.save('Data/temp/{}'.format(filename))
 			image = Image.open(self.photo.data)
 			filename = get_filename()
-			exif = image.info['exif']
+			try:
+				exif = image.info['exif']
+			except KeyError:
+				exif = None
 			image.save('static/Pictures/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:], exif=exif)
 			width, height = image.size
 

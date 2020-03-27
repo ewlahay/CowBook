@@ -48,6 +48,8 @@ json = FlaskJSON()
 userDatastore = SQLAlchemyUserDatastore(db, User, Role)
 security = Security(app, userDatastore)
 mail = Mail(app)
+json.init_app(app)
+db.create_all()
 
 
 @app.before_first_request
@@ -67,6 +69,4 @@ def custom_encoder(o):
 
 
 if __name__ == '__main__':
-	json.init_app(app)
-	db.create_all()
 	app.run(debug=True, host='0.0.0.0')
