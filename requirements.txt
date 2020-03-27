@@ -2,6 +2,7 @@ Pillow
 ics
 bcrypt
 git+https://github.com/mattupstate/flask-security
+flask-json
 Babel==2.8.0
 Click==7.0
 decorator==4.4.1

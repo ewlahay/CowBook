@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import render_template, request, redirect, url_for, flash
 from flask_security import login_required, current_user
 
@@ -75,7 +77,7 @@ def add_cow():
 
 @app.route('/herd/duedates')
 def view_due_date():
-	defaultDate = Treatment.get_next_due_date()
+	defaultDate = Treatment.get_next_due_date() or datetime.now()
 	return render_template("/Cow/DueDates.html", defaultDate=defaultDate)
 
 

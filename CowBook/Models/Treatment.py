@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from typing import Union
 
 from flask_table import Table, Col, LinkCol, BoolCol
 from flask_wtf import FlaskForm
@@ -222,7 +223,7 @@ def get_due_dates(start, end):
 	return dueDates
 
 
-def get_next_due_date():
+def get_next_due_date() -> Union[datetime, None]:
 	now = datetime.now() - timedelta(288)
 	first = db.session.query(Bred).order_by(desc(Bred.date)).filter(func.date(Bred.date) >= now).first()
 	if first is None:
