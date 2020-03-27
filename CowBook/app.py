@@ -1,14 +1,12 @@
-import flask_login
-from flask_admin.contrib.sqla import ModelView
 from sqlalchemy.exc import IntegrityError
 
 from flask_json import FlaskJSON
 import flask_security.core as core
 from flask_nav.elements import Navbar, View, Subgroup, Separator, Link
-from flask_mail import Mail, Message
+from flask_mail import Mail
 from flask_security import SQLAlchemyUserDatastore, Security
 from CowBook.Models.Cow.CowModel import Cow
-from CowBook.Models.User import User, Role, get_user
+from CowBook.Models.User import User, Role
 from CowBook.init import app, nav, db
 from CowBook import routes
 from CowBook import api

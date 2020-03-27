@@ -6,3 +6,4 @@
 /.idea/
 /migrations/
 /CowBook/static/Pictures/
+/__pycache__/

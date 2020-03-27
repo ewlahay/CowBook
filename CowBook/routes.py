@@ -1,5 +1,4 @@
-import flask_login
-from flask import render_template, request, redirect, url_for, flash, abort, session
+from flask import render_template, request, redirect, url_for, flash
 from flask_security import login_required, current_user
 
 from CowBook.Forms.BredForm import BredForm

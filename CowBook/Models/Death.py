@@ -1,7 +1,6 @@
 from sqlalchemy import Column, Integer, ForeignKey, Date, String
 from sqlalchemy.orm import relationship
 
-#from Models.Cow.CowModel import Cow
 from CowBook.init import db
 
 
