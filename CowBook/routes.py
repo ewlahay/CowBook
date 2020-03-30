@@ -6,6 +6,7 @@ from flask_security import login_required, current_user
 from CowBook.Forms.BredForm import BredForm
 from CowBook.Forms.Cow.EditParentForm import EditParentForm
 from CowBook.Forms.DeathForm import DeathForm
+from CowBook.Forms.EditTreatmentForm import EditTreatmentForm
 from CowBook.Forms.EventForm import EventForm
 from CowBook.Forms.PregnancyCheckForm import PregnancyCheckForm
 from CowBook.Forms.SaleForm import SaleForm
@@ -208,3 +209,21 @@ def treatments():
 		tables.append(Treatment.BredTable(Treatment.get_breedings()))
 		tables.append(Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks()))
 	return render_template("Treatments.html", tables=tables, treat=treatType)
+
+
+@app.route('/herd/treatments/<treatId>/edit', methods=["GET", "POST"])
+@login_required
+def edit_treatment(treatId):
+	treat = Treatment.get_treatment(treatId)
+	if treat is None:
+		return render_template('/Error/404.html', content="Treatment {} not found".format(treat))
+	form = EditTreatmentForm(treatId)
+	if form.validate_on_submit():
+		try:
+			form.save(None)
+		except ValueError as e:
+			flash(e)
+			return render_template("/EditTreatment.html", form=form, treat=treat)
+		return redirect(url_for('cow', cowId=treat.parent))
+	form.setup()
+	return render_template("/EditTreatment.html", form=form, treat=treat)

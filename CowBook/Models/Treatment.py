@@ -91,6 +91,7 @@ class TreatmentTable(EventTable):
 	withdrawal = Col("Withdrawal time (Days)")
 	dosage = Col("Dose")
 	unit = Col("Unit")
+	edit = LinkCol("Edit", "edit_treatment", url_kwargs=dict(treatId='id'), text_fallback="edit")
 
 
 class Weight(Base, db.Model):
@@ -179,6 +180,10 @@ def get_treatments(cow=None):
 	if cow is None:
 		return db.session.query(Treatment).all()
 	return db.session.query(Treatment).filter_by(parent=cow.id)
+
+
+def get_treatment(id) -> Treatment:
+	return db.session.query(Treatment).filter_by(id=id).first()
 
 
 def get_pregnancy_checks(cow=None):
