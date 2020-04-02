@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, Float, Date
 from sqlalchemy.orm import relationship
 
-from CowBook.init import db
+from CowBook.app import db
 
 
 class Sale(db.Model):

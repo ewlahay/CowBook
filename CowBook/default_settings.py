@@ -1,6 +1,5 @@
 DEBUG = True
 TESTING = True
-SQLALCHEMY_DATABASE_URI = 'sqlite:///Data/test.db'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 MAIL_SERVER = 'smtp.gmail.com'
 MAIL_PORT = 465

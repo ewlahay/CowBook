@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, Blueprint
 from flask_security import login_required, current_user
 
 from CowBook.Forms.BredForm import BredForm
@@ -20,8 +20,9 @@ from CowBook.Models.Death import get_dead
 from CowBook.Models.DeathTable import DeathTable
 from CowBook.Models.Sale import get_sold
 from CowBook.Models.SoldTable import SoldTable
-from CowBook.init import app
 from CowBook.Models import Treatment
+
+app = Blueprint('app', __name__, url_prefix='/')
 
 
 @app.context_processor
@@ -71,8 +72,8 @@ def herd():
 def add_cow():
 	form = CowForm()
 	if form.validate_on_submit():
-		form.save()
-		return redirect(url_for('herd'))
+		tempCow = form.save()
+		return redirect(url_for('app.cow', cowId=tempCow.id))
 	return render_template("/Cow/AddCow.html", form=form)
 
 
@@ -136,7 +137,7 @@ def treatment(cowId):
 			if request.method == 'POST':
 				form.validate()
 			return render_template("/Cow/AddTreatment.html", cow=tempCow, form=form)
-		return redirect(url_for('cow', cowId=cowId))
+		return redirect(url_for('app.cow', cowId=cowId))
 	else:
 		return render_template("/Error/404.html")
 
@@ -150,7 +151,7 @@ def edit_cow(cowId):
 	form = EditCowForm(cowId)
 	if form.validate_on_submit():
 		form.save()
-		return redirect(url_for('cow', cowId=cowId))
+		return redirect(url_for('app.cow', cowId=cowId))
 	form.setup()
 	return render_template("/Cow/Edit.html", cow=tempCow, form=form)
 
@@ -168,7 +169,7 @@ def edit_dam(cowId):
 		except ValueError as e:
 			flash(e)
 			return render_template("/Cow/EditParent.html", cow=newCow, form=form)
-		return redirect(url_for('cow', cowId=cowId))
+		return redirect(url_for('app.cow', cowId=cowId))
 	return render_template("/Cow/EditParent.html", cow=newCow, form=form)
 
 
@@ -185,7 +186,7 @@ def edit_sire(cowId):
 		except ValueError as e:
 			flash(e)
 			return render_template("/Cow/EditParent.html", cow=newCow, form=form)
-		return redirect(url_for('cow', cowId=cowId))
+		return redirect(url_for('app.cow', cowId=cowId))
 	return render_template("/Cow/EditParent.html", cow=newCow, form=form)
 
 
@@ -224,6 +225,6 @@ def edit_treatment(treatId):
 		except ValueError as e:
 			flash(e)
 			return render_template("/EditTreatment.html", form=form, treat=treat)
-		return redirect(url_for('cow', cowId=treat.parent))
+		return redirect(url_for('app.cow', cowId=treat.parent))
 	form.setup()
 	return render_template("/EditTreatment.html", form=form, treat=treat)

@@ -8,8 +8,20 @@
 {% block app_content %}
 
 <div class="formwrapper">
-    <h2 class="title">Add Cow</h2>
-    {{ wtf.quick_form(form) }}
+    <form method="POST" enctype="multipart/form-data">
+        <h2 class="title">Add Cow</h2><br>
+        Name: {{wtf.form_field(form.name, "inline")}}
+        DOB: {{wtf.form_field(form.dob, "inline")}}
+        Tag #: {{wtf.form_field(form.earTag, "inline")}}
+        Sex: {{wtf.form_field(form.sex, "inline")}}
+        Carrier: {{form.carrier}}<br><br>
+        Owner: {{wtf.form_field(form.owner, "inline")}}
+        Markings: {{wtf.form_field(form.markings, "inline")}}
+        Photo: {{wtf.form_field(form.photo, "inline")}}
+        {{ wtf.form_errors(form, hiddens="only") }}
+        {{ form.csrf_token }}
+        {{wtf.form_field(form.submit) }}
+    </form>
 </div>
 
 {% endblock %}

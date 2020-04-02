@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import SubmitField, IntegerField
 
 from CowBook.Models.Cow.CowModel import get_by_id
-from CowBook.init import db
+from CowBook.app import db
 
 
 class EditParentForm(FlaskForm):

@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 
 from CowBook.Models.Death import Death
 from CowBook.Models.Sale import Sale
-from CowBook.init import db
+from CowBook.app import db
 
 
 class Sex(enum.Enum):

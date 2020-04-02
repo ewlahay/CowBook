@@ -10,7 +10,7 @@ from wtforms_alchemy import model_form_factory
 
 from CowBook.Models.Cow import CowModel
 from CowBook.Util.DBLink import CowNameLinkCol
-from CowBook.init import db
+from CowBook.app import db
 
 MIN_GESTATION = 279
 
@@ -56,7 +56,7 @@ class EventTable(Table):
 		else:
 			return None
 	"""
-	parent = LinkCol("Cow", 'cow', url_kwargs=dict(cowId='parent'), attr='parent')
+	parent = LinkCol("Cow", 'app.cow', url_kwargs=dict(cowId='parent'), attr='parent')
 	date = Col("Date")
 	type = Col("Type")
 	notes = Col("Notes")
@@ -91,7 +91,7 @@ class TreatmentTable(EventTable):
 	withdrawal = Col("Withdrawal time (Days)")
 	dosage = Col("Dose")
 	unit = Col("Unit")
-	edit = LinkCol("Edit", "edit_treatment", url_kwargs=dict(treatId='id'), text_fallback="edit")
+	edit = LinkCol("Edit", "app.edit_treatment", url_kwargs=dict(treatId='id'), text_fallback="edit")
 
 
 class Weight(Base, db.Model):

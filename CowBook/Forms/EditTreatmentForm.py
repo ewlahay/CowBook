@@ -1,7 +1,7 @@
 from wtforms import SubmitField
 from CowBook.Forms.TreatmentForm import TreatmentForm
 from CowBook.Models.Treatment import get_treatment
-from CowBook.init import db
+from CowBook.app import db
 
 
 class EditTreatmentForm(TreatmentForm):

@@ -2,7 +2,7 @@ from flask import flash
 from flask_wtf import FlaskForm
 from wtforms_alchemy import model_form_factory
 
-from CowBook.init import db
+from CowBook.app import db
 
 ModelForm = model_form_factory(FlaskForm)
 from CowBook.Models.Death import Death, get_by_parent_id

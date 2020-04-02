@@ -4,7 +4,7 @@ from CowBook.Util.MoneyColumn import MoneyCol
 
 class SoldTable(Table):
 	table_id = "HerdTable"
-	name = LinkCol("Name", 'cow', url_kwargs=dict(cowId='id'), attr='name')
+	name = LinkCol("Name", 'app.cow', url_kwargs=dict(cowId='id'), attr='name')
 	earTag = Col("Ear Tag #")
 	dob = Col("Date of Birth")
 	sex = Col("Sex")

@@ -1,3 +1,4 @@
+import os
 import string
 
 from flask_wtf import FlaskForm
@@ -6,7 +7,7 @@ from wtforms.fields import SubmitField, StringField
 from wtforms_alchemy import model_form_factory
 from PIL import Image
 from CowBook.Models.Cow.CowModel import Cow
-from CowBook.init import db
+from CowBook.app import db
 import random
 from os import path
 ModelForm = model_form_factory(FlaskForm)
@@ -45,7 +46,7 @@ class CowForm(ModelForm):
 			filename = get_filename()
 
 			# exif = image.info['exif']
-			image.save('static/Pictures/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
+			image.save('Cowbook/static/Pictures/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
 			width, height = image.size
 
 			if width > height:
@@ -54,7 +55,7 @@ class CowForm(ModelForm):
 				size = (width / height, IMAGE_SIZE)
 			image.thumbnail(size)
 
-			image.save('static/Pictures/small/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
+			image.save('Cowbook/static/Pictures/small/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
 			return filename + IMAGE_FORMAT
 		return None
 

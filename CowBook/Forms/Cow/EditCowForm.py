@@ -1,6 +1,6 @@
 from CowBook.Models.Cow.CowModel import get_by_id
 from CowBook.Forms.Cow.CowForm import CowForm
-from CowBook.init import db
+from CowBook.app import db
 
 
 class EditCowForm(CowForm):

@@ -12,9 +12,9 @@
     {% endif %}
     <span style="float: right">
         {% if current_user.is_authenticated %}
-        {{ utils.form_button(url_for('edit_dam', cowId=cow.id), "{} Dam".format("Edit" if dam else "Add"), method='get', class="btn btn-{}".format("default" if dam else "primary")) }}
-        {{ utils.form_button(url_for('edit_sire', cowId=cow.id), "{} Sire".format("Edit" if sire else "Add"), method='get', class="btn btn-{}".format("default" if sire else "primary")) }}
-        {{ utils.form_button(url_for('edit_cow', cowId=cow.id), "Edit", method='get', class="btn btn-default") }}
+        {{ utils.form_button(url_for('app.edit_dam', cowId=cow.id), "{} Dam".format("Edit" if dam else "Add"), method='get', class="btn btn-{}".format("default" if dam else "primary")) }}
+        {{ utils.form_button(url_for('app.edit_sire', cowId=cow.id), "{} Sire".format("Edit" if sire else "Add"), method='get', class="btn btn-{}".format("default" if sire else "primary")) }}
+        {{ utils.form_button(url_for('app.edit_cow', cowId=cow.id), "Edit", method='get', class="btn btn-default") }}
         {% endif %}
     </span>
     <div id="cowInfo">
@@ -31,14 +31,14 @@
             {% if dam or sire %}
             Parents:<br>
             </h3>
-                <h4>
-                {% if dam %}
-                    Dam: <a href="{{url_for('cow', cowId=dam.id)}}">{{dam.__str__()}}</a><br>
-                {% endif %}
-                {% if sire %}
-                    Sire: <a href="{{url_for('cow', cowId=sire.id)}}">{{sire.__str__()}}</a>
-                {% endif %}
-                </h4>
+        <h4>
+            {% if dam %}
+            Dam: <a href="{{url_for('app.cow', cowId=dam.id)}}">{{dam.__str__()}}</a><br>
+            {% endif %}
+            {% if sire %}
+            Sire: <a href="{{url_for('app.cow', cowId=sire.id)}}">{{sire.__str__()}}</a>
+            {% endif %}
+        </h4>
             {% else %}
             </h3>
             {% endif %}
@@ -66,13 +66,10 @@
 
         <br>
         {% if current_user.is_authenticated %}
-        <a class="btn btn-primary" href="{{url_for('treatment', cowId=cow.id)}}" role="button">Add Event</a>
+        <a class="btn btn-primary" href="{{url_for('app.treatment', cowId=cow.id)}}" role="button">Add Event</a>
         {% endif %}
     </div>
 
-	
-
-	
 {% endblock %}
 
 {% block scripts %}

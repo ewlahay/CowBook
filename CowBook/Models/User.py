@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, ForeignKey, String, DateTime, Boolean
 from sqlalchemy.orm import relationship, backref
 
-from CowBook.init import db
+from CowBook.app import db
 from flask_security import UserMixin, RoleMixin
 
 
@@ -37,6 +37,7 @@ class User(db.Model, UserMixin):
 
     def get_id(self):
         return str(self.id).encode("utf-8").decode("utf-8")
+
 
 def get_user(user_id):
     return db.session.query(User).filter_by(id=user_id).first()
