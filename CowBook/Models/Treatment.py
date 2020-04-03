@@ -10,7 +10,7 @@ from wtforms.fields import SubmitField, StringField, IntegerField, BooleanField,
 from wtforms_alchemy import model_form_factory
 
 from CowBook.Models.Cow import CowModel
-from CowBook.Util.DBLink import CowNameLinkCol
+from CowBook.Util.DBLink import CowNameLinkCol, CowIdLinkCol
 from CowBook.app import db
 
 MIN_GESTATION = 279
@@ -52,16 +52,7 @@ class Event(Base, db.Model):
 class EventTable(Table):
 	table_id = "Events"
 	title = table_id
-	"""
-	@property
-	def parent(self):
-		print("Getting parent!")
-		if self.show_parent is True:
-			return LinkCol("Cow", 'cow', url_kwargs=dict(cowId='parent'), attr='parent')
-		else:
-			return None
-	"""
-	parent = LinkCol("Cow", 'app.cow', url_kwargs=dict(cowId='parent'), attr='parent', text_fallback="cow")
+	parent = CowIdLinkCol("Cow")
 	date = DateCol("Date", date_format="MM/dd/yyyy")
 	type = Col("Type")
 	notes = Col("Notes")
