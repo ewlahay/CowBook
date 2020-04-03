@@ -2,6 +2,7 @@ pytest
 Pillow
 ics
 bcrypt
+flask-admin
 git+https://github.com/mattupstate/flask-security
 flask-json
 Babel==2.8.0
