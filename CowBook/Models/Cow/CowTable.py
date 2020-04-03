@@ -1,11 +1,11 @@
-from flask_table import Table, Col, LinkCol, BoolNaCol
+from flask_table import Table, Col, LinkCol, BoolNaCol, DateCol
 
 
 class CowTable(Table):
 	table_id = "HerdTable"
 	name = LinkCol("Name", 'app.cow', url_kwargs=dict(cowId='id'), attr='name')
 	earTag = Col("Ear Tag #")
-	dob = Col("Date of Birth")
+	dob = DateCol("Date of Birth", date_format="MM/dd/yyyy")
 	sex = Col("Sex")
 	is_heifer = BoolNaCol("Heifer")
 	# is_sold = BoolNaCol("Sold")

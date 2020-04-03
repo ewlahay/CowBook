@@ -12,6 +12,7 @@
     {% endif %}
     <span style="float: right">
         {% if current_user.is_authenticated %}
+        <a class="btn btn-primary" href="{{url_for('app.treatment', cowId=cow.id)}}" role="button">Add Event</a>
         {{ utils.form_button(url_for('app.edit_dam', cowId=cow.id), "{} Dam".format("Edit" if dam else "Add"), method='get', class="btn btn-{}".format("default" if dam else "primary")) }}
         {{ utils.form_button(url_for('app.edit_sire', cowId=cow.id), "{} Sire".format("Edit" if sire else "Add"), method='get', class="btn btn-{}".format("default" if sire else "primary")) }}
         {{ utils.form_button(url_for('app.edit_cow', cowId=cow.id), "Edit", method='get', class="btn btn-default") }}
@@ -20,7 +21,7 @@
     <div id="cowInfo">
         <h3>
             Name: {{cow.name}}<br>
-            DOB: {{cow.dob}}<br>
+            DOB: {{cow.dob.strftime("%m/%d/%Y")}}<br>
             Tag #: {{cow.earTag}}<br>
             Sex: {{cow.sex}}<br>
             Carrier: {{cow.carrier}}<br>
@@ -30,13 +31,13 @@
 
             {% if dam or sire %}
             Parents:<br>
-            </h3>
+        </h3>
         <h4>
             {% if dam %}
-            Dam: <a href="{{url_for('app.cow', cowId=dam.id)}}">{{dam.__str__()}}</a><br>
+            Dam: <a href="{{url_for('app.cow', cowId=dam.id)}}">{{dam.name}}</a><br>
             {% endif %}
             {% if sire %}
-            Sire: <a href="{{url_for('app.cow', cowId=sire.id)}}">{{sire.__str__()}}</a>
+            Sire: <a href="{{url_for('app.cow', cowId=sire.id)}}">{{sire.name}}</a>
             {% endif %}
         </h4>
             {% else %}
@@ -65,19 +66,17 @@
             {{treatments}}
 
         <br>
-        {% if current_user.is_authenticated %}
-        <a class="btn btn-primary" href="{{url_for('app.treatment', cowId=cow.id)}}" role="button">Add Event</a>
-        {% endif %}
+
     </div>
 
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
-    {{ fancy_table('HerdTable', buttons=false) }}
-    {{ fancy_table('Weights', buttons=false) }}
-    {{ fancy_table('Events', buttons=false) }}
-    {{ fancy_table('Treatments', buttons=false) }}
-    {{ fancy_table('PregnancyChecks', buttons=false) }}
-    {{ fancy_table('breedingHistory', buttons=false) }}
+{{ super() }}
+{{ fancy_table('HerdTable', buttons=false) }}
+{{ fancy_table('Weights', buttons=false, hideFirst=True) }}
+{{ fancy_table('Events', buttons=false, hideFirst=True) }}
+{{ fancy_table('Treatments', buttons=false, hideFirst=True) }}
+{{ fancy_table('PregnancyChecks', buttons=false, hideFirst=True) }}
+{{ fancy_table('breedingHistory', buttons=false, hideFirst=True) }}
 {%- endblock scripts %}

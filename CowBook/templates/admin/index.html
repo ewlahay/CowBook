@@ -1,0 +1,136 @@
+{% extends 'admin/master.html' %}
+
+{% block head_css %}
+{{ super() }}
+<style>
+    div.container {
+        //display:grid;
+        grid-template-columns: max-content max-content;
+        grid-gap:5px;
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+
+</style>
+{% endblock %}
+{% block body %}
+
+<div class="container">
+    <div id="bar-chart" style="float: left"></div>
+    <div id="pie-chart" style="float: right"></div>
+</div>
+{% endblock %}
+
+{% block tail %}
+<link rel="stylesheet" href="https://uicdn.toast.com/tui.chart/latest/tui-chart.min.css">
+<script src="https://uicdn.toast.com/tui.chart/latest/tui-chart-all.min.js"></script>
+<script>
+    function renderBarChart(data) {
+        var categories = [];
+        var age = [];
+        var container = document.getElementById('bar-chart');
+        data = data.sort(function(a, b) {
+            return a.age - b.age;
+        });
+
+        for (var i = 0; i < data.length; ++i) {
+            age.push(data[i].age);
+            categories.push(data[i].name);
+        }
+        var parsedData = {
+            categories: categories,
+            series: [
+                {
+                    name: 'Age',
+                    data: age
+                }
+            ]
+        };
+        var options = {
+            usageStatistics: false,
+            chart: {
+                width: document.body.clientWidth/2.5,
+                height: 600,
+                title: 'Age',
+                format: '1000',
+                align: 'center'
+            },
+            yAxis: {
+                title: 'Name'
+
+            },
+            xAxis: {
+                title: '',
+                min: 0,
+                max: Math.round(age[age.length - 1] + 1),
+                suffix: ' years',
+            },
+             series: {
+                 showLabel: true
+             },
+             legend: {
+                 visible: false
+             }
+        };
+        tui.chart.barChart(container, parsedData, options);
+    }
+
+    function renderPieChart(data) {
+        var bull = 0;
+        var cow = 0;
+        var steer = 0;
+        var container = document.getElementById('pie-chart');
+        for (var i = 0; i < data.length; ++i) {
+            if (data[i].sex == "bull") {
+                bull++;
+            } else if (data[i].sex == "cow") {
+                cow++;
+            } else if (data[i].sex == "steer") {
+                steer++;
+            }
+        }
+        var parsedData = {
+            categories: ['Sex'],
+            series: [
+                {
+                    name: 'Cow',
+                    data: cow
+                },
+                {
+                    name: 'Bull',
+                    data: bull
+                },
+                {
+                    name: 'Steer',
+                    data: steer
+                },
+            ]
+        }
+        var options = {
+            usageStatistics: false,
+            chart: {
+                width: document.body.clientWidth/2.5,
+                height: 600,
+                title: 'Sex of Herd'
+            },
+            series: {
+                showLegend: true,
+                showLabel: true,
+                labelAlign: 'center'
+            },
+            legend: {
+                visible: false
+            }
+        };
+        tui.chart.pieChart(container, parsedData, options);
+    }
+
+    function renderCharts(data) {
+        renderBarChart(data);
+        renderPieChart(data);
+    }
+
+    $.get("/api/herd", renderCharts);
+
+</script>
+{% endblock %}

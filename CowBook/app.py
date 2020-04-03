@@ -1,4 +1,3 @@
-from flask import Blueprint
 from flask_bootstrap import Bootstrap
 from flask_nav import Nav
 from flask_sqlalchemy import SQLAlchemy

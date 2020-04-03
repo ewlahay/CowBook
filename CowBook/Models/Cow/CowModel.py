@@ -36,6 +36,12 @@ class Cow(db.Model):
 	sale = relationship("Sale", uselist=False, back_populates="cow")
 	death = relationship("Death", uselist=False, back_populates="cow")
 
+	# treatments = relationship("Treatment", uselist=False, backref="cow")
+	# events = relationship("Event", uselist=False, backref="cow")
+	# weights = relationship("Weight", uselist=False, backref="cow")
+	# pregnancychecks = relationship("PregnancyCheck", uselist=False, backref="cow")
+	# breds = relationship("Bred", uselist=False, backref="cow")
+
 	@property
 	def is_heifer(self):
 		calves = get_calves(self)
@@ -60,6 +66,10 @@ class Cow(db.Model):
 		if self.is_sold:
 			return "sold"
 		return "{} years old".format(((datetime.now().date() - self.dob).days / 365).__round__(2))
+
+	@property
+	def age(self):
+		return ((datetime.now().date() - self.dob).days / 365).__round__(2)
 
 	def set_dam_id(self, dam_id):
 		if dam_id == self.id:
@@ -92,14 +102,14 @@ class Cow(db.Model):
 		self.photo = photo
 
 	def __str__(self):
-		return "{} #{} {}".format(self.name, self.earTag, self.dob.strftime("%d/%m/%y"))
+		return "{} #{} {}".format(self.name, self.earTag, self.dob.strftime("%m/%d/%Y"))
 
 	def __json__(self):
 		value = {
 			'id': self.id,
 			'name': self.name,
 			'earTag': self.earTag,
-			'dob': self.dob.strftime("%Y-%m-%d"),
+			'dob': self.dob.strftime("%m/%d/%Y"),
 			'dam_id': self.dam_id,
 			'sire_id': self.sire_id,
 			'sex': self.sex,
@@ -107,7 +117,8 @@ class Cow(db.Model):
 			'owner': self.owner,
 			'markings': self.markings,
 			'photo': self.photo,
-			'isHeifer': self.is_heifer
+			'isHeifer': self.is_heifer,
+			'age': self.age
 		}
 		return value
 

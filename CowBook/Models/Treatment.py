@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
 from typing import Union
 
-from flask_table import Table, Col, LinkCol, BoolCol
+from flask_table import Table, Col, LinkCol, BoolCol, DateCol
 from flask_wtf import FlaskForm
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, Date, Boolean, and_, func, desc
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship
 from wtforms.fields import SubmitField, StringField, IntegerField, BooleanField, DateField, FloatField, SelectField
 from wtforms_alchemy import model_form_factory
 
@@ -28,7 +29,11 @@ class Base(object):
 
 	@declared_attr
 	def parent(self):  # The cow that the event belongs to/is linked to in the database.
-		return Column(Integer, ForeignKey('Cow.id'))
+		return Column(Integer, ForeignKey('Cow.id'), nullable=False)
+
+	@declared_attr
+	def cow(self):
+		return relationship('Cow')
 
 	notes = Column(String)
 
@@ -56,8 +61,8 @@ class EventTable(Table):
 		else:
 			return None
 	"""
-	parent = LinkCol("Cow", 'app.cow', url_kwargs=dict(cowId='parent'), attr='parent')
-	date = Col("Date")
+	parent = LinkCol("Cow", 'app.cow', url_kwargs=dict(cowId='parent'), attr='parent', text_fallback="cow")
+	date = DateCol("Date", date_format="MM/dd/yyyy")
 	type = Col("Type")
 	notes = Col("Notes")
 
@@ -87,7 +92,7 @@ class TreatmentTable(EventTable):
 	table_id = "Treatments"
 	title = "Medical"
 	lotNo = Col("Lot #")
-	expiration = Col("Expiration")
+	expiration = DateCol("Expiration", date_format="MM/dd/yyyy")
 	withdrawal = Col("Withdrawal time (Days)")
 	dosage = Col("Dose")
 	unit = Col("Unit")

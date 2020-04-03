@@ -25,7 +25,7 @@ def test_add_cow(client):
 	assert data["name"] == "Dotty"
 	assert data["isHeifer"] is True
 	assert data["earTag"] == 45
-	assert data["dob"] == "2012-10-19"
+	assert data["dob"] == "10/19/2012"
 	assert data["sex"] == "cow"
 	assert data["carrier"] is False
 	assert data["owner"] == "Molly"
@@ -39,7 +39,7 @@ def test_add_cow(client):
 	assert data["name"] == "Ditzy"
 	assert data["isHeifer"] is True
 	assert data["earTag"] == 13
-	assert data["dob"] == "2012-10-19"
+	assert data["dob"] == "10/19/2012"
 	assert data["sex"] == "cow"
 	assert data["carrier"] is True
 	assert data["owner"] == "Molly"

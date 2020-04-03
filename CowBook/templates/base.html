@@ -2,13 +2,14 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 {% import 'bootstrap/utils.html' as utils %}
 
-{% macro fancy_table(id, buttons=true) %}
-    <script>
+{% macro fancy_table(id, buttons=true, hideFirst=False) %}
+<script>
         $(document).ready( function () {
-            $('#{{id}}').DataTable({
+            var table = $('#{{id}}').DataTable({
                 colReorder: true,
                 fixedHeader: true,
                 responsive: true,
+                deferRender: true,
                 paging: false,
                 scollY: "50%"
                 {% if buttons %}
@@ -18,8 +19,13 @@
                 {% endif %}
             });
             $('#{{id}}').css("width", "80%");
+            {% if hideFirst %}
+            table.column( 0 ).visible( false );
+            {% endif %}
             $('#{{id}}').DataTable().draw();
+
         });
+
     </script>
 {% endmacro %}
 
@@ -48,9 +54,21 @@
 {% endblock %}
 
 {% block scripts %}
-    {{ super() }}
-    <script src="{{ url_for('static', filename='moment.js') }}"></script>
-    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='DataTables/datatables.css')}}">
-    <script type="text/javascript" charset="utf8" src="{{url_for('static', filename='DataTables/datatables.js')}}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha256-bqVeqGdJ7h/lYPq6xrPv/YGzMEb6dNxlfiTUHSgRCp8=" crossorigin="anonymous"></script>
+{{ super() }}
+<script src="{{ url_for('static', filename='moment.js') }}"></script>
+<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='DataTables/datatables.min.css')}}">
+<script type="text/javascript" charset="utf8"
+        src="{{url_for('static', filename='DataTables/datatables.min.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
+        integrity="sha256-bqVeqGdJ7h/lYPq6xrPv/YGzMEb6dNxlfiTUHSgRCp8=" crossorigin="anonymous"></script>
+{% if current_user.is_active and current_user.is_authenticated %}
+<script>
+        $(".navbar-collapse").append(
+            '<ul class="nav navbar-nav" style="float: right;">\
+                <li><a href="/admin" style="padding-right: 0px">Admin</a></li>\
+            </ul>'
+        );
+
+</script>
+{% endif %}
 {%- endblock scripts %}
