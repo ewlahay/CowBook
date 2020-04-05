@@ -45,12 +45,10 @@ class CowForm(ModelForm):
 			image = Image.open(self.photo.data)
 			filename = get_filename()
 
+			dirname = os.getcwd()
 			# exif = image.info['exif']
-			try:
-				image.save('Cowbook/static/Pictures/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
-			except FileNotFoundError:
-				print("Current directory: ", os.getcwd())
-				image.save('static/Pictures/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
+			image.save(os.path.join(dirname, 'Cowbook/static/Pictures/{}{}'.format(filename, IMAGE_FORMAT)),
+			           IMAGE_FORMAT[1:])
 			width, height = image.size
 
 			if width > height:
@@ -59,10 +57,8 @@ class CowForm(ModelForm):
 				size = (round(width / height), IMAGE_SIZE)
 			image.thumbnail(size)
 
-			try:
-				image.save('Cowbook/static/Pictures/small/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
-			except FileNotFoundError:
-				image.save('static/Pictures/small/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
+			image.save(os.path.join(dirname, 'Cowbook/static/Pictures/small/{}{}'.format(filename, IMAGE_FORMAT)),
+			           IMAGE_FORMAT[1:])
 			return filename + IMAGE_FORMAT
 		return None
 
