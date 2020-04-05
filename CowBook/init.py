@@ -1,7 +1,7 @@
 import os
 import warnings
 
-from flask import Flask
+from flask import Flask, render_template
 from flask_admin import Admin
 from flask_bootstrap import Bootstrap
 from flask_json import FlaskJSON
@@ -60,7 +60,7 @@ def create_app(config=None):
 	admin.add_view(TreatmentView(Bred, db.session, category="Treatments"))
 	admin.add_view(TreatmentView(Sale, db.session))
 	admin.add_view(TreatmentView(Death, db.session))
-
+	app.register_error_handler(404, page_not_found)
 	app.register_blueprint(routes)
 	app.register_blueprint(api)
 
@@ -85,3 +85,7 @@ def create_user(app, db, userDatastore):
 def custom_encoder(o):
 	if isinstance(o, Cow):
 		return o.__json__()
+
+
+def page_not_found(e, message=None):
+	return render_template('Error/404.html', content=message), 404
