@@ -15,7 +15,7 @@ from CowBook.Models.Death import Death
 from CowBook.Models.Sale import Sale
 from CowBook.Models.Treatment import Treatment, Event, Weight, PregnancyCheck, Bred
 from CowBook.Models.User import User, Role
-from CowBook.Views.Admin.Data import UserView, TreatmentView
+from CowBook.Views.Admin.Data import UserView, TreatmentView, BaseView, CowView
 
 json = FlaskJSON()
 
@@ -53,6 +53,7 @@ def create_app(config=None):
 	with warnings.catch_warnings():
 		warnings.filterwarnings('ignore', 'Fields missing from ruleset', UserWarning)
 		admin.add_view(UserView(User, db.session))
+	admin.add_view(CowView(Cow, db.session))
 	admin.add_view(TreatmentView(Treatment, db.session, category="Treatments"))
 	admin.add_view(TreatmentView(Event, db.session, category="Treatments"))
 	admin.add_view(TreatmentView(Weight, db.session, category="Treatments"))

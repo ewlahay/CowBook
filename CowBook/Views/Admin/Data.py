@@ -7,6 +7,7 @@ from flask import url_for, redirect, request, abort
 
 class BaseView(ModelView):
 	form_base_class = SecureForm
+	can_create = False
 
 	def is_accessible(self):
 		return current_user.is_active and current_user.is_authenticated
@@ -25,16 +26,20 @@ class BaseView(ModelView):
 
 
 class UserView(BaseView):
+	can_create = True
 	column_exclude_list = ['password', 'username', 'confirmed_at']
 	form_create_rules = ('email', 'password')
 	can_edit = False
 
 
 class TreatmentView(BaseView):
-	can_create = False
 	form_ajax_refs = {
 		'cow': {
 			'fields': ['name', ],
 			'page_size': 10
 		}
 	}
+
+
+class CowView(BaseView):
+	can_edit = False
