@@ -59,8 +59,6 @@
 <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='DataTables/datatables.min.css')}}">
 <script type="text/javascript" charset="utf8"
         src="{{url_for('static', filename='DataTables/datatables.min.js')}}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"
-        integrity="sha256-bqVeqGdJ7h/lYPq6xrPv/YGzMEb6dNxlfiTUHSgRCp8=" crossorigin="anonymous"></script>
 {% if current_user.is_active and current_user.is_authenticated %}
 <script>
         $(".navbar-collapse").append(

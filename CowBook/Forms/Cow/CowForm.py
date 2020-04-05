@@ -50,9 +50,9 @@ class CowForm(ModelForm):
 			width, height = image.size
 
 			if width > height:
-				size = (IMAGE_SIZE, height / width * IMAGE_SIZE)
+				size = (IMAGE_SIZE, round(height / width * IMAGE_SIZE))
 			else:
-				size = (width / height, IMAGE_SIZE)
+				size = (round(width / height), IMAGE_SIZE)
 			image.thumbnail(size)
 
 			image.save('Cowbook/static/Pictures/small/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
