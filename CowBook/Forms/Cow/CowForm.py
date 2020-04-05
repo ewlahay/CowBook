@@ -47,7 +47,7 @@ class CowForm(ModelForm):
 
 			# dirname = os.getcwd()
 			# exif = image.info['exif']
-			image.save('./Cowbook/static/Pictures/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
+			image.save('CowBook/static/Pictures/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
 			width, height = image.size
 
 			if width > height:
@@ -56,7 +56,7 @@ class CowForm(ModelForm):
 				size = (round(width / height), IMAGE_SIZE)
 			image.thumbnail(size)
 
-			image.save('./Cowbook/static/Pictures/small/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
+			image.save('CowBook/static/Pictures/small/{}{}'.format(filename, IMAGE_FORMAT), IMAGE_FORMAT[1:])
 			return filename + IMAGE_FORMAT
 		return None
 
