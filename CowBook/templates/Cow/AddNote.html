@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}
+Add Note
+{% endblock %}
+
+{% block app_content %}
+<div id="formwrapper">
+    <form method="POST" enctype="multipart/form-data">
+        <h2 class="title">Add Note</h2><br>
+        Date: {{wtf.form_field(form.date, "inline")}}
+        Text:
+        <textarea class="form-control" id="text" name="text" required="" rows="3"></textarea>
+        {{ wtf.form_errors(form, hiddens="only") }}
+        {{ form.csrf_token }}
+        <input id="submit" class="btn btn-default" value="submit" type="submit">
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    var today = new Date();
+    today = today.getFullYear() + "-" + String(today.getMonth() + 1).padStart(2, '0') + "-" + String(today.getDate()).padStart(2, '0');
+    document.getElementById("date").value = today;
+
+</script>
+{%- endblock scripts %}

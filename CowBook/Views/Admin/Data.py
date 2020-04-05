@@ -1,8 +1,12 @@
 # Flask-Admin views
 from flask_admin.contrib.sqla import ModelView
+from flask_admin.contrib.sqla.ajax import QueryAjaxModelLoader
 from flask_admin.form import SecureForm
 from flask_login import current_user
 from flask import url_for, redirect, request, abort
+
+from CowBook.Models.Cow.CowModel import Cow
+from CowBook.app import db
 
 
 class BaseView(ModelView):
@@ -33,11 +37,10 @@ class UserView(BaseView):
 
 
 class TreatmentView(BaseView):
+	form_excluded_columns = ('cow')
 	form_ajax_refs = {
-		'cow': {
-			'fields': ['name', ],
-			'page_size': 10
-		}
+
+		'cow': QueryAjaxModelLoader('user', db.session, Cow, fields=['name'], page_size=10)
 	}
 
 

@@ -14,7 +14,6 @@
 {% block scripts %}
     {{ super() }}
     <script>
-
         function hideForms() {
             var input = $("#formType")[0].value;
             //console.log($("#formType")[0]);
@@ -109,6 +108,12 @@
                 } else if (perPound != "") {
                     $("#weight")[0].value = (total/perPound).toFixed(2);
                 }
+            }
+        });
+        $("#dosage").on( "input", function() {
+            var unit = $("#unit")[0];
+            if (unit.value == "" || unit.value == null) {
+                unit.value = "ml";
             }
         });
 1   </script>

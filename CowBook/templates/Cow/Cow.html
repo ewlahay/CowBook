@@ -13,6 +13,7 @@
     <span style="float: right">
         {% if current_user.is_authenticated %}
         <a class="btn btn-primary" href="{{url_for('app.treatment', cowId=cow.id)}}" role="button">Add Event</a>
+        <a class="btn btn-primary" href="{{url_for('app.add_note', cowId=cow.id)}}" role="button">Add Note</a>
         {{ utils.form_button(url_for('app.edit_dam', cowId=cow.id), "{} Dam".format("Edit" if dam else "Add"), method='get', class="btn btn-{}".format("default" if dam else "primary")) }}
         {{ utils.form_button(url_for('app.edit_sire', cowId=cow.id), "{} Sire".format("Edit" if sire else "Add"), method='get', class="btn btn-{}".format("default" if sire else "primary")) }}
         {{ utils.form_button(url_for('app.edit_cow', cowId=cow.id), "Edit", method='get', class="btn btn-default") }}
@@ -56,15 +57,16 @@
 
         {% if cow.sex != "steer"%}
         <h3>Calves:</h3>
-            {{calves}}
+        {{calves}}
         {% endif %}
         <h3>Weights:</h3>
-            {{weights}}
+        {{weights}}
         <h3>Events:</h3>
-            {{events}}
+        {{events}}
         <h3>Treatments:</h3>
-            {{treatments}}
-
+        {{treatments}}
+        <h3>Notes:</h3>
+        {{notes}}
         <br>
 
     </div>
@@ -73,10 +75,11 @@
 
 {% block scripts %}
 {{ super() }}
-{{ fancy_table('HerdTable', buttons=false) }}
+{{ fancy_table('HerdTable', buttons=False) }}
 {{ fancy_table('Weights', buttons=false, hideFirst=True) }}
 {{ fancy_table('Events', buttons=false, hideFirst=True) }}
 {{ fancy_table('Treatments', buttons=false, hideFirst=True) }}
 {{ fancy_table('PregnancyChecks', buttons=false, hideFirst=True) }}
 {{ fancy_table('breedingHistory', buttons=false, hideFirst=True) }}
+{{ fancy_table('NoteTable', buttons=False) }}
 {%- endblock scripts %}

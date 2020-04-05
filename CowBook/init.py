@@ -3,19 +3,16 @@ import warnings
 
 from flask import Flask, render_template
 from flask_admin import Admin
-from flask_bootstrap import Bootstrap
 from flask_json import FlaskJSON
-from flask_nav import Nav
 from flask_security import SQLAlchemyUserDatastore
-from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
-from flask_admin.contrib.sqla import ModelView
 from CowBook.Models.Cow.CowModel import Cow
 from CowBook.Models.Death import Death
+from CowBook.Models.Note import Note
 from CowBook.Models.Sale import Sale
 from CowBook.Models.Treatment import Treatment, Event, Weight, PregnancyCheck, Bred
 from CowBook.Models.User import User, Role
-from CowBook.Views.Admin.Data import UserView, TreatmentView, BaseView, CowView
+from CowBook.Views.Admin.Data import UserView, TreatmentView, CowView
 
 json = FlaskJSON()
 
@@ -27,7 +24,6 @@ def create_app(config=None):
 	app = Flask(__name__)
 	app.config.from_object('CowBook.default_settings')
 	if config is None:
-		# app.config.from_pyfile(os.environ['APP_CONFIG'])
 		try:
 			app.config.from_envvar('APP_CONFIG')
 		except RuntimeError:
@@ -54,6 +50,7 @@ def create_app(config=None):
 		warnings.filterwarnings('ignore', 'Fields missing from ruleset', UserWarning)
 		admin.add_view(UserView(User, db.session))
 	admin.add_view(CowView(Cow, db.session))
+	admin.add_view(TreatmentView(Note, db.session))
 	admin.add_view(TreatmentView(Treatment, db.session, category="Treatments"))
 	admin.add_view(TreatmentView(Event, db.session, category="Treatments"))
 	admin.add_view(TreatmentView(Weight, db.session, category="Treatments"))

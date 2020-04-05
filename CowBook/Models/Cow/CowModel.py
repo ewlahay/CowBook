@@ -33,8 +33,10 @@ class Cow(db.Model):
 	owner = Column(String, nullable=False)
 	markings = Column(String)
 	photo = Column(String)
+	# active = Column(Boolean)
 	sale = relationship("Sale", uselist=False, back_populates="cow")
 	death = relationship("Death", uselist=False, back_populates="cow")
+	notes = relationship("Note", back_populates="cow")
 
 	# treatments = relationship("Treatment", uselist=False, backref="cow")
 	# events = relationship("Event", uselist=False, backref="cow")
@@ -91,7 +93,7 @@ class Cow(db.Model):
 		else:
 			raise ValueError("Parent doesn't exist!")
 
-	def __init__(self, name, earTag, dob: datetime, sex, carrier, owner, markings, photo):
+	def __init__(self, name, earTag, dob: datetime, sex, carrier, owner, markings, photo, active=True):
 		self.name = name
 		self.earTag = earTag
 		self.dob = dob  # datetime.strptime(dob, "%Y-%m-%d")
@@ -100,6 +102,8 @@ class Cow(db.Model):
 		self.owner = owner
 		self.markings = markings
 		self.photo = photo
+
+	# self.active = active
 
 	def __str__(self):
 		return "{} #{} {}".format(self.name, self.earTag, self.dob.strftime("%m/%d/%Y"))

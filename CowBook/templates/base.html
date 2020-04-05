@@ -2,15 +2,17 @@
 {% import 'bootstrap/wtf.html' as wtf %}
 {% import 'bootstrap/utils.html' as utils %}
 
-{% macro fancy_table(id, buttons=true, hideFirst=False) %}
+{% macro fancy_table(id, buttons=True, hideFirst=False, paging=True, column=1) %}
 <script>
         $(document).ready( function () {
+            $.fn.dataTable.moment( 'MM/DD/YYYY' );
             var table = $('#{{id}}').DataTable({
                 colReorder: true,
                 fixedHeader: true,
                 responsive: true,
                 deferRender: true,
-                paging: false,
+                paging: {% if paging %}true{% else %}false{% endif %},
+                "order": [[ {{column}}, "desc" ]],
                 scollY: "50%"
                 {% if buttons %}
                 ,
@@ -23,7 +25,6 @@
             table.column( 0 ).visible( false );
             {% endif %}
             $('#{{id}}').DataTable().draw();
-
         });
 
     </script>
@@ -66,6 +67,25 @@
                 <li><a href="/admin" style="padding-right: 0px">Admin</a></li>\
             </ul>'
         );
+
+
+</script>
+<script>
+    $.fn.dataTable.moment = function ( format, locale ) {
+        var types = $.fn.dataTable.ext.type;
+
+        // Add type detection
+        types.detect.unshift( function ( d ) {
+            return moment( d, format, locale, true ).isValid() ?
+                'moment-'+format :
+                null;
+        } );
+
+        // Add sorting method - use an integer for the sorting
+        types.order[ 'moment-'+format+'-pre' ] = function ( d ) {
+            return moment( d, format, locale, true ).unix();
+        };
+    };
 
 </script>
 {% endif %}

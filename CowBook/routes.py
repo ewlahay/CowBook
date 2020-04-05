@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import render_template, request, redirect, url_for, flash, Blueprint
 from flask_security import login_required, current_user
 
+from CowBook.Forms.NoteForm import NoteForm
 from CowBook.Forms.BredForm import BredForm
 from CowBook.Forms.Cow.EditParentForm import EditParentForm
 from CowBook.Forms.DeathForm import DeathForm
@@ -18,6 +19,7 @@ from CowBook.Models.Cow.CowTable import CowTable
 from CowBook.Forms.Cow.EditCowForm import EditCowForm
 from CowBook.Models.Death import get_dead
 from CowBook.Models.DeathTable import DeathTable
+from CowBook.Models.Note import NoteTable
 from CowBook.Models.Sale import get_sold
 from CowBook.Models.SoldTable import SoldTable
 from CowBook.Models import Treatment
@@ -97,10 +99,11 @@ def cow(cowId):
 	treats = Treatment.TreatmentTable(Treatment.get_treatments(tempCow))
 	pregnancyChecks = Treatment.PregnancyCheckTable(Treatment.get_pregnancy_checks(tempCow))
 	breedings = Treatment.BredTable(Treatment.get_breedings(tempCow))
-	# del breedings.parent
+	notes = NoteTable(tempCow.notes)
 
 	return render_template("/Cow/Cow.html", cow=tempCow, calves=calves, weights=weights, events=events,
-	                       treatments=treats, pregnancyCheck=pregnancyChecks, breedings=breedings, dam=dam, sire=sire)
+	                       treatments=treats, pregnancyCheck=pregnancyChecks, notes=notes, breedings=breedings, dam=dam,
+	                       sire=sire)
 
 
 @app.route('/herd/<cowId>/addEvent', methods=["GET", "POST"])
@@ -140,6 +143,24 @@ def treatment(cowId):
 		return redirect(url_for('app.cow', cowId=cowId))
 	else:
 		return render_template("/Error/404.html")
+
+
+@app.route('/herd/<cowId>/addNote', methods=["GET", "POST"])
+@login_required
+def add_note(cowId):
+	tempCow = get_by_id(cowId)
+	if tempCow is not None:
+		form = NoteForm()
+
+		if form.validate_on_submit():
+			form.save(cowId)
+		else:
+			if request.method == 'POST':
+				form.validate()
+			return render_template("/Cow/AddNote.html", cow=tempCow, form=form)
+		return redirect(url_for('app.cow', cowId=cowId))
+	else:
+		return render_template("/Error/404.html", content="Cow not found!")
 
 
 @app.route('/herd/<cowId>/edit', methods=["GET", "POST"])
