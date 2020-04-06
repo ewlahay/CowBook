@@ -37,7 +37,6 @@ class Cow(db.Model):
 	sale = relationship("Sale", uselist=False, back_populates="cow")
 	death = relationship("Death", uselist=False, back_populates="cow")
 	notes = relationship("Note", back_populates="cow")
-
 	# treatments = relationship("Treatment", uselist=False, backref="cow")
 	# events = relationship("Event", uselist=False, backref="cow")
 	# weights = relationship("Weight", uselist=False, backref="cow")
@@ -72,6 +71,10 @@ class Cow(db.Model):
 	@property
 	def age(self):
 		return ((datetime.now().date() - self.dob).days / 365).__round__(2)
+
+	@property
+	def calves(self):
+		return get_calves(self)
 
 	def set_dam_id(self, dam_id):
 		if dam_id == self.id:

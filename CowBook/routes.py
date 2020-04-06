@@ -106,6 +106,14 @@ def cow(cowId):
 	                       sire=sire)
 
 
+@app.route('/herd/<cowId>/stats')
+def stats(cowId):
+	tempCow = get_by_id(cowId)
+	if tempCow is None:
+		return render_template('/Error/404.html', content="Cow {} not found".format(cowId))
+	return render_template('/Cow/Dashboard.html', cow=tempCow)
+
+
 @app.route('/herd/<cowId>/addEvent', methods=["GET", "POST"])
 @login_required
 def treatment(cowId):

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{cow.name}}'s stats
+{% endblock %}
+
+{% block app_content %}
+Age: {{cow.age}} years<br>
+Calves: {{cow.calves|length}}<br>
+
+{% endblock %}
