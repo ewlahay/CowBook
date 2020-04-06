@@ -9,7 +9,6 @@ from tests.helpers import login
 def test_empty_db(client):
 	"""Start with a blank database."""
 	rv = client.get('/api/herd?filter=all')
-	print(rv.data)
 	assert b'[]' in rv.data
 
 

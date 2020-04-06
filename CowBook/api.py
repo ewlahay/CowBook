@@ -75,9 +75,9 @@ def export_due_dates():
 		event.begin = dueDate["start"]
 		event.end = dueDate["end"]
 		calender.events.add(event)
-	file = open(os.getcwd() + "/CowBook/static/calendar.ics", mode="w")
+	file = open(os.path.dirname(__file__) + "/static/calendar.ics", mode="w")
 	file.writelines(calender)
 	file.close()
-	return send_file(os.getcwd() + "/CowBook/static/calendar.ics", mimetype="text/calendar")
+	return send_file(os.path.dirname(__file__) + "/static/calendar.ics", mimetype="text/calendar")
 
 # TODO Implement calendar feed
