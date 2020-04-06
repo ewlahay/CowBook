@@ -12,7 +12,7 @@ Add Note
         Text:
         <textarea class="form-control" id="text" name="text" required="" rows="3"></textarea>
         {{ wtf.form_errors(form, hiddens="only") }}
-        {{ form.csrf_token }}
+        {{ form.csrf_token }}<br>
         <input id="submit" class="btn btn-default" value="submit" type="submit">
     </form>
 </div>

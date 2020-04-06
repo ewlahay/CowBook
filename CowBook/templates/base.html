@@ -39,19 +39,74 @@
 {% endblock %}
 
 {% block content %}
-    <div class="container">
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-info" role="alert">{{ message }}</div>
-            {% endfor %}
-        {% endif %}
-        {% endwith %}
+<style>
+.card {
+    /* Add shadows to create the "card" effect */
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    #width: 30%;
+    height: 225px;
+    border-radius: 8px; /* 5px rounded corners */
+    display: inline-block;
+    vertical-align: top;
+    margin: 15px;
+    background-color: white;
+}
 
-        {# application content needs to be provided in the app_content block #}
-        {% block app_content %}{% endblock %}
+.overlay {
+    position: absolute;
+    top: 5%;
+    left: 5%;
+    z-index: 10;
+}
+
+/* On mouse-over, add a deeper shadow */
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+/* Add some padding inside the card container */
+.textContainer {
+  padding: 16px;
+  height: inherit;
+  overflow: auto;
+}
+
+.card img {
+    border-radius: 8px 0 0 8px;
+    padding-top: 0px;
+    float: left;
+    margin-right: 10px;
+    max-width: 70%;
+    height: auto;
+    max-height: 100%
+}
+
+</style>
+<div class="container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-info" role="alert">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    {# application content needs to be provided in the app_content block #}
+    {% block app_content %}{% endblock %}
+</div>
+<template id="cowCard">
+    <div class="card overlay">
+        <img id="image" src="">
+        <div class="textContainer">
+            <h3 id="name"></h3>
+            <p id="dob"></p>
+            <p id="tag"></p>
+            <p id="sex"></p>
+            <p id="owner"></p>
+        </div>
     </div>
-
+</template>
 {% endblock %}
 
 {% block scripts %}
@@ -69,7 +124,9 @@
         );
 
 
+
 </script>
+{% endif %}
 <script>
     $.fn.dataTable.moment = function ( format, locale ) {
         var types = $.fn.dataTable.ext.type;
@@ -87,6 +144,43 @@
         };
     };
 
+
 </script>
-{% endif %}
+<script>
+    var id = 0;
+    function renderCard(element) {
+        var link = element.pathname;
+        var body = element.parentElement;
+        $.get("/api" + link, function(cow) {
+            var template = $("#cowCard")[0].content.children[0];
+            let clone = template.cloneNode(true);
+            let children = clone.children
+            if (cow.photo != "" && cow.photo != null) {
+                children.namedItem("image").src = "/static/Pictures/small/" + cow.photo;
+            } else {
+                clone.style.width = "max-content";
+            }
+            let attributes = children[1].children;
+            attributes[0].innerText = cow.name;
+            attributes[1].innerText = "DOB: " + cow.dob;
+            attributes[2].innerText = "Tag #" + cow.earTag;
+            attributes[3].innerText = "Sex: " + cow.sex;
+            attributes[4].innerText = "Owner: " + cow.owner;
+            clone.onclick = function() { window.location = window.location.origin + "/herd/" + cow.id;}
+            clone.onmouseout = function() {
+                $(".card").hide();
+            };
+            clone.id = id++;
+            body.appendChild(clone);
+            element.onmouseover = function() {
+                $("#" + clone.id).show();
+            }
+            element.onmouseout = function() {
+                $("#" + clone.id).hide();
+            }
+        });
+    }
+
+</script>
+
 {%- endblock scripts %}

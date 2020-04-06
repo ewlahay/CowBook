@@ -1,43 +1,6 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-<style>
-.card {
-    /* Add shadows to create the "card" effect */
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-    transition: 0.3s;
-    #width: 30%;
-    height: 225px;
-    border-radius: 8px; /* 5px rounded corners */
-    display: inline-block;
-    vertical-align: top;
-    margin: 15px;
-
-}
-
-/* On mouse-over, add a deeper shadow */
-.card:hover {
-  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-}
-
-/* Add some padding inside the card container */
-.textContainer {
-  padding: 16px;
-  height: inherit;
-  overflow: auto;
-}
-
-img {
-    border-radius: 8px 0 0 8px;
-    padding-top: 0px;
-    float: left;
-    margin-right: 10px;
-    max-width: 70%;
-    height: auto;
-    max-height: 100%
-}
-
-</style>
  <span class="form-group" style="float: right">
   <label for="filter">Filter by:</label>
   <select class="form-control" id="filter" onchange="updateContent(this.value)" style="width: auto">
@@ -51,18 +14,7 @@ img {
 <div id="herdContainer">
 
 </div>
-<template id="cowCard" >
-    <div class="card">
-        <img id="image" src="">
-        <div class="textContainer">
-            <h3 id="name"></h3>
-            <p id="dob"></p>
-            <p id="tag"></p>
-            <p id="sex"></p>
-            <p id="owner"></p>
-        </div>
-    </div>
-</template>
+
 
 {% endblock %}
 
@@ -70,7 +22,6 @@ img {
     {{ super() }}
     <script>
         function updateMargin(value) {
-            //let value = $(".custom-range")[0].value;
             //console.log(value);
             $(".card").css("margin", value + "px");
         }
@@ -80,6 +31,7 @@ img {
 
         function renderCows(data) {
             var template = $("#cowCard")[0].content.children[0];
+            template.className = "card";
             var body = $("#herdContainer")[0];
             body.textContent = '';
             //console.log(template);

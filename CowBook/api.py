@@ -1,9 +1,11 @@
+import os
 from datetime import datetime, timedelta
 
 from flask import request, send_file, Blueprint
 from flask_json import as_json
+from flask_security import login_required
 
-from CowBook.Models.Cow.CowModel import get_all_dams, get_all_sires, get_all, get_active
+from CowBook.Models.Cow.CowModel import get_all_dams, get_all_sires, get_all, get_active, get_by_id
 from CowBook.Models.Death import get_dead
 from CowBook.Models.Sale import get_sold
 from CowBook.Models import Treatment
@@ -41,6 +43,12 @@ def get_herd():
 	return get_active()
 
 
+@api.route("/herd/<cowId>")
+@as_json
+def get_cow(cowId):
+	return get_by_id(cowId)
+
+
 @api.route('/herd/duedates')
 @as_json
 def get_due_dates():
@@ -56,6 +64,7 @@ def get_due_dates():
 
 
 @api.route('/calendar/dueDates.ics')
+@login_required
 def export_due_dates():
 	calender = Calendar(creator="CowBook")
 	dueDates = Treatment.get_due_dates(datetime.now().date(), datetime.now().date() + timedelta(
@@ -66,9 +75,9 @@ def export_due_dates():
 		event.begin = dueDate["start"]
 		event.end = dueDate["end"]
 		calender.events.add(event)
-	file = open("Data/Calendar.ics", mode="w")
+	file = open(os.getcwd() + "/CowBook/static/calendar.ics", mode="w")
 	file.writelines(calender)
 	file.close()
-	return send_file("Data/Calendar.ics", mimetype="text/calendar")
+	return send_file(os.getcwd() + "/CowBook/static/calendar.ics", mimetype="text/calendar")
 
 # TODO Implement calendar feed
