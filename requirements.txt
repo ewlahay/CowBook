@@ -35,3 +35,4 @@ Werkzeug==0.16.0
 WTForms==2.2.1
 WTForms-Alchemy==0.16.9
 WTForms-Components==0.10.4
+pytz
