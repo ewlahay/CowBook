@@ -5,6 +5,7 @@ from flask import request, send_file, Blueprint
 from flask_json import as_json
 from flask_security import login_required
 
+from CowBook.Models.Cow import CowModel
 from CowBook.Models.Cow.CowModel import get_all_dams, get_all_sires, get_all, get_active, get_by_id
 from CowBook.Models.Death import get_dead
 from CowBook.Models.Sale import get_sold
@@ -47,6 +48,15 @@ def get_herd():
 @as_json
 def get_cow(cowId):
 	return get_by_id(cowId)
+
+
+@api.route("herd/<cowId>/treatments")
+@as_json
+def get_treatments(cowId):
+	tempCow = CowModel.get_by_id(cowId)
+	if tempCow is None:
+		return []
+	return Treatment.get_treatments(tempCow)
 
 
 @api.route('/herd/duedates')

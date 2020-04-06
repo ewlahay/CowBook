@@ -81,7 +81,7 @@ def create_user(app, db, userDatastore):
 
 @json.encoder
 def custom_encoder(o):
-	if isinstance(o, Cow):
+	if isinstance(o, (Cow, Treatment)):
 		return o.__json__()
 
 

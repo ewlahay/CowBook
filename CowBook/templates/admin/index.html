@@ -16,8 +16,9 @@
 {% block body %}
 
 <div class="container">
-    <div id="bar-chart" style="float: left"></div>
-    <div id="pie-chart" style="float: right"></div>
+    <div id="bar-chart" style="display: inline-block"></div>
+    <div id="pie-chart" style="display: inline-block"></div>
+    <div id="line-chart" style="display: inline-block"></div>
 </div>
 {% endblock %}
 
@@ -128,9 +129,84 @@
     function renderCharts(data) {
         renderBarChart(data);
         renderPieChart(data);
+        renderLineChart(data)
     }
 
     $.get("/api/herd", renderCharts);
+
+
+</script>
+<script>
+    function calculateAge(start, end) {
+        return end.diff(start, "years", true);
+    }
+
+    function calculateHerdAge(herd, time) {
+        var age = 0;
+        var count = 0;
+        for (var i = 0; i < herd.length; ++i) {
+            var dob = moment(herd[i].dob, 'MM/DD/YYYY');
+            var diff = calculateAge(dob, time);
+            if (diff > 0) {
+                age += diff;
+                count++;
+            }
+        }
+        return age / count;
+    }
+
+    function renderLineChart(data) {
+        data = data.sort(function(a, b) {
+            return a.age - b.age;
+        });
+        var container = document.getElementById('line-chart');
+        var now = moment();
+        categories = [];
+        ages = [];
+        var oldest = moment(data[data.length - 1].dob, 'MM/DD/YYYY');
+        var start = oldest.clone();
+        while (start < now) {
+            categories.push(start.format("L"));
+            start.add(1, "years");
+            var herdAge = calculateHerdAge(data, start);
+            ages.push(herdAge);
+        }
+        console.log(oldest);
+        series = [{
+            name: "Herd age",
+            data: ages
+        }];
+
+
+        var data = {
+            categories: categories,
+            series: series
+        };
+        console.log(data);
+        var options = {
+            usageStatistics: false,
+            chart: {
+                width: document.body.clientWidth/1.25,
+                height: 540,
+                title: 'Age over time'
+            },
+            yAxis: {
+                title: 'Age (Years)',
+            },
+            xAxis: {
+                title: 'Month',
+                pointOnColumn: true,
+                dateFormat: 'MMM',
+                tickInterval: 'auto'
+            },
+            series: {
+                showDot: false,
+                zoomable: true
+            },
+
+        };
+        var chart = tui.chart.lineChart(container, data, options);
+    }
 
 </script>
 {% endblock %}

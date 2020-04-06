@@ -4,8 +4,114 @@
 {{cow.name}}'s stats
 {% endblock %}
 
-{% block app_content %}
-Age: {{cow.age}} years<br>
-Calves: {{cow.calves|length}}<br>
+{% block head %}
+{{ super() }}
+<link href="{{ url_for('static', filename='timeline/css/timeline.min.css') }}" rel="stylesheet">
+{% endblock %}
 
+{% block app_content %}
+<template id="timelineItem">
+    <div class="timeline__item">
+        <div class="timeline__content">
+            <h2></h2>
+            <h3></h3>
+            <p></p>
+        </div>
+    </div>
+</template>
+Age: {{cow.age}} years<br>
+Calves: {{cow.calves|length}}<br><br>
+<div class="timeline">
+    <div class="timeline__wrap">
+        <div class="timeline__items">
+        </div>
+    </div>
+</div>
+<br><br>
+<div id="lineChart">
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    function addTimeLineData(data) {
+        var template = $("#timelineItem")[0].content.children[0];
+        var body = $(".timeline__items")[0];
+        body.textContent = '';
+        for (var i = 0; i < data.length; ++i) {
+            let clone = template.cloneNode(true);
+            let attributes = clone.children[0].children;
+            attributes[0].innerText = data[i].date;
+            attributes[1].innerText = data[i].type;
+            attributes[2].innerText = data[i].notes;
+            body.appendChild(clone);
+        }
+        jQuery('.timeline').timeline({
+          mode: 'horizontal',
+          forceVerticalMode: 600, // 600px
+          startIndex: null
+        });
+    }
+
+    $.get("/api/herd/{{cow.id}}/treatments", addTimeLineData);
+
+</script>
+<script src="{{ url_for('static', filename='timeline/js/timeline.min.js') }}"></script>
+<link rel="stylesheet" href="https://uicdn.toast.com/tui.chart/latest/tui-chart.min.css">
+<script src="https://uicdn.toast.com/tui.chart/latest/tui-chart-all.min.js"></script>
+<script>
+var container = document.getElementById('lineChart');
+var dob = moment("{{cow.dob}}", 'YYYY/MM/DD');
+categories = [dob.format("L")];
+data = [0];
+var now = moment();
+
+function calculateAge(start, end) {
+    return end.diff(start, "years", true);
+}
+
+var date = dob.clone();
+while (date < now) {
+    date.add(1, 'months');
+    categories.push(date.format("L"));
+    data.push(calculateAge(dob, date));
+}
+
+var data = {
+    categories: categories,
+    series: [
+        {
+            name: '{{cow.name}}',
+            data: data
+        }
+    ]
+};
+var options = {
+    usageStatistics: false,
+    chart: {
+        width: document.body.clientWidth/1.25,
+        height: 540,
+        title: 'Age over time'
+    },
+    yAxis: {
+        title: 'Age (Years)',
+    },
+    xAxis: {
+        title: 'Month',
+        pointOnColumn: true,
+        dateFormat: 'MMM',
+        tickInterval: 'auto'
+    },
+    series: {
+        showDot: false,
+        zoomable: true
+    },
+
+};
+var chart = tui.chart.lineChart(container, data, options);
+
+</script>
 {% endblock %}

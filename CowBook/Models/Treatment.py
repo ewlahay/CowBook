@@ -43,6 +43,14 @@ class Base(object):
 		self.parent = parent
 		self.notes = notes
 
+	def __json__(self):
+		value = {
+			'id': self.id,
+			'date': self.date.strftime("%m/%d/%Y"),
+			'type': self.type,
+			'notes': self.notes
+		}
+		return value
 
 class Event(Base, db.Model):
 	# everything is inherited
