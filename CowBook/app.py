@@ -35,6 +35,7 @@ def navbar():
 	)
 	if core.current_user.is_authenticated:
 		navy.items.append(View("Add Cow", 'app.add_cow'))
+		navy.items.append(View("Quick Form", 'app.custom_form_treatment'))
 		navy.items.append(View("User", "app.user"))
 		navy.items.append(Link("Logout", "/logout"))
 	else:

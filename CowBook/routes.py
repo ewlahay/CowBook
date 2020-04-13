@@ -114,40 +114,46 @@ def stats(cowId):
 	return render_template('/Cow/Dashboard.html', cow=tempCow)
 
 
+def handle_add_event_form(tempCow=None):
+	"""Creates and validates a multi use form"""
+	# Single form with every possible field
+	form = Treatment.Form()
+	# Set choices for form type on frontend
+	form.formType.choices = [("Event", "Event"), ("Treatment", "Treatment"), ("Weight", "Weight"), ("Sale", "Sale"),
+	                         ("Death", "Death")]
+	if tempCow is None or tempCow.sex == "cow":
+		form.formType.choices.append(("Pregnancy Check", "Pregnancy Check"))
+		form.formType.choices.append(("Bred", "Bred"))
+	form.formType.choices.sort(key=lambda x: x[0])
+	formType = {
+		"Event": EventForm,
+		"Treatment": TreatmentForm,
+		"Weight": WeightForm,
+		"Pregnancy Check": PregnancyCheckForm,
+		"Bred": BredForm,
+		"Sale": SaleForm,
+		"Death": DeathForm,
+	}
+	item = formType.get(form.formType.data)
+	if item is None:
+		item = form
+	else:
+		item = item()
+	return item
+
+
 @app.route('/herd/<cowId>/addEvent', methods=["GET", "POST"])
 @login_required
 def treatment(cowId):
 	tempCow = get_by_id(cowId)
 	if tempCow is not None:
-		# Single form with every possible field
-		form = Treatment.Form()
-		# Set choices for form type on frontend
-		form.formType.choices = [("Event", "Event"), ("Treatment", "Treatment"), ("Weight", "Weight"), ("Sale", "Sale"),
-		                         ("Death", "Death")]
-		if tempCow.sex == "cow":
-			form.formType.choices.append(("Pregnancy Check", "Pregnancy Check"))
-			form.formType.choices.append(("Bred", "Bred"))
-		form.formType.choices.sort(key=lambda x: x[0])
-		formType = {
-			"Event": EventForm,
-			"Treatment": TreatmentForm,
-			"Weight": WeightForm,
-			"Pregnancy Check": PregnancyCheckForm,
-			"Bred": BredForm,
-			"Sale": SaleForm,
-			"Death": DeathForm,
-		}
-		item = formType.get(form.formType.data)
-		if item is None:
-			item = form
-		else:
-			item = item()
+		item = handle_add_event_form(tempCow)
 		if item.validate_on_submit():
 			item.save(cowId)
 		else:
 			if request.method == 'POST':
-				form.validate()
-			return render_template("/Cow/AddTreatment.html", cow=tempCow, form=form)
+				item.validate()
+			return render_template("/Cow/AddTreatment.html", cow=tempCow, form=item)
 		return redirect(url_for('app.cow', cowId=cowId))
 	else:
 		return render_template("/Error/404.html")
@@ -257,3 +263,59 @@ def edit_treatment(treatId):
 		return redirect(url_for('app.cow', cowId=treat.parent))
 	form.setup()
 	return render_template("/EditTreatment.html", form=form, treat=treat)
+
+
+@app.route('/herd/treatments/customform', methods=['GET', 'POST'])
+@login_required
+def custom_form_treatment():
+	form = handle_add_event_form()
+	if request.method == 'POST':
+		if form.validate():
+			kwargs = request.form.copy()
+			kwargs['csrf_token'] = None
+			kwargs['submit'] = None
+			for key, value in request.form.items():
+				if value is None or value == "":
+					del kwargs[key]
+			return redirect(url_for('app.custom_form', **kwargs))
+	return render_template("/Cow/AddTreatment.html", form=form)
+
+
+@app.route('/herd/treatments/custom')
+@login_required
+def custom_form():
+	formType = {
+		"Event": EventForm,
+		"Treatment": TreatmentForm,
+		"Weight": WeightForm,
+		"Pregnancy Check": PregnancyCheckForm,
+		"Bred": BredForm,
+		"Sale": SaleForm,
+		"Death": DeathForm,
+	}
+	if len(request.args) > 0:
+		args = request.args.copy()
+		try:
+			form = formType[args['formType']]()
+			args['csrf_token'] = None
+			date = args['date']
+			date = datetime.strptime(date, "%Y-%m-%d")
+			del args['date']
+			form.date.data = date
+			try:
+				exp = args['expiration']
+				exp = datetime.strptime(exp, "%Y-%m-%d")
+				del args['expiration']
+			except KeyError:
+				pass
+		except KeyError:
+			return render_template('/Error/404.html', content="Invalid Parameters")
+
+		if form is not None:
+			for key, value in args.items():
+				try:
+					form[key].data = value
+				except KeyError:
+					pass
+			return render_template("/CustomEventForm.html", form=form, formType=args['formType'])
+	return render_template('/Error/404.html', content="Invalid form")
