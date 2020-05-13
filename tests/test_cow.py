@@ -11,6 +11,9 @@ def test_cow():
 	assert cow.owner == "Luke"
 	assert cow.markings == "Yellow"
 
+	cow2 = CowModel.Cow(None, "45", datetime(2019, 1, 1), "cow", False, "Luke", "Yellow", None)
+	assert cow2.name == "45"
+
 
 if __name__ == '__main__':
 	test_cow()

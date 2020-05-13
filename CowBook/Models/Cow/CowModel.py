@@ -37,6 +37,7 @@ class Cow(db.Model):
 	sale = relationship("Sale", uselist=False, back_populates="cow")
 	death = relationship("Death", uselist=False, back_populates="cow")
 	notes = relationship("Note", back_populates="cow")
+
 	# treatments = relationship("Treatment", uselist=False, backref="cow")
 	# events = relationship("Event", uselist=False, backref="cow")
 	# weights = relationship("Weight", uselist=False, backref="cow")
@@ -97,7 +98,7 @@ class Cow(db.Model):
 			raise ValueError("Parent doesn't exist!")
 
 	def __init__(self, name, earTag, dob: datetime, sex, carrier, owner, markings, photo, active=True):
-		self.name = name
+		self.name = name or earTag  # Empty names default to earTag number
 		self.earTag = earTag
 		self.dob = dob  # datetime.strptime(dob, "%Y-%m-%d")
 		self.sex = sex
