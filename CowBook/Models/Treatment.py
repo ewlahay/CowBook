@@ -3,7 +3,7 @@ from typing import Union
 
 from flask_table import Table, Col, LinkCol, BoolCol, DateCol
 from flask_wtf import FlaskForm
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, Date, Boolean, and_, func, desc
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, Date, Boolean, and_, func, desc, asc
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import relationship
 from wtforms.fields import SubmitField, StringField, IntegerField, BooleanField, DateField, FloatField, SelectField
@@ -234,7 +234,7 @@ def get_due_dates(start, end):
 
 def get_next_due_date() -> Union[datetime, None]:
 	now = datetime.now() - timedelta(288)
-	first = db.session.query(Bred).order_by(desc(Bred.date)).filter(func.date(Bred.date) >= now).first()
+	first = db.session.query(Bred).order_by(asc(Bred.date)).filter(func.date(Bred.date) >= now).first()
 	if first is None:
 		return None
 	return first.date + timedelta(MIN_GESTATION)
