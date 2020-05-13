@@ -1,13 +1,12 @@
 {% extends "base.html" %}
 {%- block styles %}
 {{ super() }}
-<link href='/static/fullcalendar/core/main.css' rel='stylesheet' />
-<link href='/static/fullcalendar/daygrid/main.css' rel='stylesheet' />
-
-<script src='/static/fullcalendar/core/main.js'></script>
-<script src='/static/fullcalendar/daygrid/main.js'></script>
-<script src='/static/fullcalendar/timegrid/main.js'></script>
-<script src='/static/fullcalendar/list/main.js'></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/core/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/daygrid/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/timegrid/main.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/4.2.0/list/main.min.js"></script>
 <script>
 
   document.addEventListener('DOMContentLoaded', function() {
