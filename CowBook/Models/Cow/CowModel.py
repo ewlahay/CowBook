@@ -33,7 +33,8 @@ class Cow(db.Model):
 	owner = Column(String, nullable=False)
 	markings = Column(String)
 	photo = Column(String)
-	# active = Column(Boolean)
+	active = Column(Boolean)
+
 	sale = relationship("Sale", uselist=False, back_populates="cow")
 	death = relationship("Death", uselist=False, back_populates="cow")
 	notes = relationship("Note", back_populates="cow")
@@ -77,6 +78,10 @@ class Cow(db.Model):
 	def calves(self):
 		return get_calves(self)
 
+	@property
+	def is_active(self):
+		return self.active and not self.is_sold and not self.is_dead
+
 	def set_dam_id(self, dam_id):
 		if dam_id == self.id:
 			raise ValueError("Can't set as own mother")
@@ -106,6 +111,7 @@ class Cow(db.Model):
 		self.owner = owner
 		self.markings = markings
 		self.photo = photo
+		self.active = active
 
 	# self.active = active
 
@@ -130,6 +136,11 @@ class Cow(db.Model):
 		}
 		return value
 
+	def save(self):
+		"""Save the cow to the database"""
+		db.session.add(self)
+		db.session.commit()
+
 
 def get_by_id(cowId):
 	cow = db.session.query(Cow).filter_by(id=cowId).first()
@@ -151,13 +162,23 @@ def get_all_sires():
 
 
 def get_by_name(name: str) -> Cow:
-	return db.session.query(Cow).filter(func.lower(Cow.name) == func.lower(name)).first()
+	if name is None or len(name) == 0:
+		return None
+	name = "{}%".format(name.lower())
+	# return db.session.query(Cow).filter(func.lower(Cow.name) == func.lower(name)).first()
+	return db.session.query(Cow).filter(func.lower(Cow.name).like(name)).first()
 
 
 def get_active():
-	cows = get_all()
-	activeCows = [x for x in cows if not x.is_sold and not x.is_dead]
+	cows = db.session.query(Cow).filter(Cow.active == True).all()
+	activeCows = [x for x in cows if x.is_active]
 	return activeCows
+
+
+def get_inactive() -> [Cow]:
+	""" Returns a list of cows marked as inactive"""
+	cows = db.session.query(Cow).filter(Cow.active == False).all()
+	return cows
 
 
 def get_all():

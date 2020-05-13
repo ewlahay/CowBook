@@ -20,6 +20,7 @@ def navbar():
 		Subgroup('Herd',
 		         View("All", 'app.herd', type='all'),
 		         View("Active", 'app.herd', type='active'),
+		         View("Inactive", 'app.herd', type='inactive'),
 		         View("Sold", 'app.herd', type='sold'),
 		         Separator(),
 		         View("Dead", 'app.herd', type='dead')
@@ -50,4 +51,4 @@ if __name__ == '__main__':
 	from CowBook.init import create_app
 
 	app = create_app()
-	app.run(debug=True, host='0.0.0.0')
+	app.run(debug=True, host='127.0.0.1')

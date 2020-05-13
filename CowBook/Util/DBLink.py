@@ -12,7 +12,7 @@ template = '''<div class="tooltip">{link}
 			            <p id="owner">{owner}</p>
 			        </div>
 			    </div>
-			</div>'''
+			</div>'''  # Not used here
 
 
 class CowNameLinkCol(Col):

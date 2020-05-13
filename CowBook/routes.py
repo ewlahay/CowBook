@@ -13,7 +13,7 @@ from CowBook.Forms.PregnancyCheckForm import PregnancyCheckForm
 from CowBook.Forms.SaleForm import SaleForm
 from CowBook.Forms.TreatmentForm import TreatmentForm
 from CowBook.Forms.WeightForm import WeightForm
-from CowBook.Models.Cow.CowModel import get_by_id, get_calves, get_all, get_active
+from CowBook.Models.Cow.CowModel import get_by_id, get_calves, get_all, get_active, get_inactive
 from CowBook.Forms.Cow.CowForm import CowForm
 from CowBook.Models.Cow.CowTable import CowTable
 from CowBook.Forms.Cow.EditCowForm import EditCowForm
@@ -50,6 +50,7 @@ def herd():
 	types = {
 		"all": get_all,
 		"active": get_active,
+		"inactive": get_inactive,
 		"sold": get_sold,
 		"dead": get_dead,
 	}
@@ -223,6 +224,23 @@ def edit_sire(cowId):
 			return render_template("/Cow/EditParent.html", cow=newCow, form=form)
 		return redirect(url_for('app.cow', cowId=cowId))
 	return render_template("/Cow/EditParent.html", cow=newCow, form=form)
+
+
+@app.route('/herd/<cowId>/edit/active/<boolean>', methods=["POST"])
+@login_required
+def set_active(cowId, boolean):
+	newCow = get_by_id(cowId)
+	if newCow is None:
+		return render_template('/Error/404.html', content="Cow {} not found".format(cowId))
+	val = True if boolean == "true" else None
+	val = False if boolean == "false" else val
+	if val is None:
+		return render_template('/Error/404.html',
+		                       content='Invalid parameter "{}". Accepted values: true, false'.format(boolean))
+	newCow.active = val
+	newCow.save()
+	flash("{} marked as {}".format(newCow.name, "active" if val else "inactive"))
+	return redirect(url_for('app.cow', cowId=cowId))
 
 
 @app.route('/herd/treatments')
