@@ -6,7 +6,7 @@ from flask_json import as_json
 from flask_security import login_required
 
 from CowBook.Models.Cow import CowModel
-from CowBook.Models.Cow.CowModel import get_all_dams, get_all_sires, get_all, get_active, get_by_id
+from CowBook.Models.Cow.CowModel import get_all_dams, get_all_sires, get_all, get_active, get_by_id, get_inactive
 from CowBook.Models.Death import get_dead
 from CowBook.Models.Sale import get_sold
 from CowBook.Models import Treatment
@@ -34,6 +34,8 @@ def get_herd():
 	filter = request.args.get("filter")
 	if filter == "active":
 		return get_active()
+	if filter == "inactive":
+		return get_inactive()
 	if filter == "all":
 		return get_all()
 	if filter == "dead":
