@@ -138,8 +138,12 @@ class Cow(db.Model):
 
 	def save(self):
 		"""Save the cow to the database"""
-		db.session.add(self)
-		db.session.commit()
+		try:
+			db.session.add(self)
+			db.session.commit()
+		except:
+			db.session.rollback()
+			raise Exception("Unable to save cow")
 
 
 def get_by_id(cowId):

@@ -2,6 +2,7 @@ from datetime import datetime
 
 from flask import render_template, request, redirect, url_for, flash, Blueprint
 from flask_security import login_required, current_user
+from sqlalchemy.exc import IntegrityError
 
 from CowBook.Forms.NoteForm import NoteForm
 from CowBook.Forms.BredForm import BredForm
@@ -75,7 +76,11 @@ def herd():
 def add_cow():
 	form = CowForm()
 	if form.validate_on_submit():
-		tempCow = form.save()
+		try:
+			tempCow = form.save()
+		except Exception:
+			flash("That name is already taken. Use a different name!")
+			return render_template("/Cow/AddCow.html", form=form)
 		return redirect(url_for('app.cow', cowId=tempCow.id))
 	return render_template("/Cow/AddCow.html", form=form)
 

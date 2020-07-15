@@ -61,10 +61,9 @@ class CowForm(ModelForm):
 		return None
 
 	def save(self):
-		#print(self.photo.data)
+		# print(self.photo.data)
 		filename = self.save_photo()
 		cow = Cow(self.name.data, self.earTag.data, self.dob.data, self.sex.data, bool(self.carrier.data),
 		          self.owner.data, self.markings.data, filename)
-		db.session.add(cow)
-		db.session.commit()
+		cow.save()
 		return cow
