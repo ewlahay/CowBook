@@ -5,7 +5,7 @@ bcrypt
 flask-admin
 flask-security
 flask-json
-Babel==2.8.0
+Babel==2.9.1
 Click==7.1.2
 decorator==4.4.1
 dominate==2.5.1
